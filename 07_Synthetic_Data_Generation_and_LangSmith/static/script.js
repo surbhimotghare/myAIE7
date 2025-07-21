@@ -19,6 +19,28 @@ const processingTime = document.getElementById('processingTime');
 // API configuration
 const API_BASE_URL = window.location.origin; // Will work for both local and deployed
 
+// Load external libraries for file parsing
+function loadExternalLibraries() {
+    // Load PDF.js for PDF parsing
+    const pdfScript = document.createElement('script');
+    pdfScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    pdfScript.onload = () => {
+        // Configure PDF.js worker
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    };
+    document.head.appendChild(pdfScript);
+
+    // Load Papa Parse for CSV parsing
+    const papaScript = document.createElement('script');
+    papaScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js';
+    document.head.appendChild(papaScript);
+}
+
+// Load libraries when page loads
+document.addEventListener('DOMContentLoaded', loadExternalLibraries);
+
 // File upload and preview logic
 fileInput.addEventListener('change', handleFileSelect);
 
@@ -32,40 +54,182 @@ function handleFileSelect(e) {
         return;
     }
 
-    files.forEach((file, idx) => {
-        const ext = file.name.split('.').pop().toLowerCase();
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        let icon = '<i class="fas fa-file-alt file-icon"></i>';
-        if (ext === 'pdf') icon = '<i class="fas fa-file-pdf file-icon" style="color:#e53e3e;"></i>';
-        if (ext === 'docx') icon = '<i class="fas fa-file-word file-icon" style="color:#3182ce;"></i>';
+    // Show processing message
+    filePreview.innerHTML = '<div style="text-align: center; color: #0077b5; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Processing files...</div>';
 
-        let infoHtml = `<div class="file-info">
-            <span class="file-name">${file.name}</span>
-            <span class="file-size">(${(file.size/1024).toFixed(1)} KB)</span>`;
+    Promise.all(files.map((file, idx) => processFile(file, idx)))
+        .then(() => {
+            if (uploadedDocs.filter(Boolean).length === 0) {
+                filePreview.innerHTML = '<div style="color:#e53e3e; text-align: center;">No supported files could be processed. Please upload .txt, .pdf, or .csv files.</div>';
+            }
+        });
+}
+
+async function processFile(file, idx) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    
+    // Set icon based on file type
+    let icon = '<i class="fas fa-file-alt file-icon"></i>';
+    if (ext === 'pdf') icon = '<i class="fas fa-file-pdf file-icon" style="color:#e53e3e;"></i>';
+    if (ext === 'csv') icon = '<i class="fas fa-file-csv file-icon" style="color:#22c55e;"></i>';
+
+    let infoHtml = `<div class="file-info">
+        <span class="file-name">${file.name}</span>
+        <span class="file-size">(${(file.size/1024).toFixed(1)} KB)</span>`;
+
+    try {
+        let extractedText = '';
+        let processStatus = 'Processing...';
 
         if (ext === 'txt') {
-            // Read as text
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                const text = ev.target.result;
-                uploadedDocs[idx] = {
-                    page_content: text.slice(0, 2000), // Limit for demo
-                    metadata: {
-                        source: file.name,
-                        size: file.size,
-                        type: file.type
-                    }
-                };
-                fileItem.innerHTML = icon + infoHtml + `<div class="file-snippet">${escapeHtml(text.slice(0, 300))}${text.length > 300 ? '...':''}</div></div>`;
-            };
-            reader.readAsText(file);
+            extractedText = await readTextFile(file);
+            processStatus = 'Processed successfully';
+        } else if (ext === 'pdf') {
+            extractedText = await readPdfFile(file);
+            processStatus = 'PDF text extracted';
+        } else if (ext === 'csv') {
+            extractedText = await readCsvFile(file);
+            processStatus = 'CSV data converted to text';
         } else {
-            // For pdf/docx, just show info, don't send to backend in MVP
-            uploadedDocs[idx] = null;
-            fileItem.innerHTML = icon + infoHtml + `<div class="file-snippet" style="color:#e53e3e;">Preview not supported in browser. Will be ignored for now.</div></div>`;
+            throw new Error(`Unsupported file type: .${ext}`);
         }
-        filePreview.appendChild(fileItem);
+
+        if (extractedText && extractedText.trim()) {
+            uploadedDocs[idx] = {
+                page_content: extractedText.slice(0, 4000), // Increased limit for PDFs
+                metadata: {
+                    source: file.name,
+                    size: file.size,
+                    type: file.type,
+                    extension: ext
+                }
+            };
+
+            fileItem.innerHTML = icon + infoHtml + 
+                `<div class="file-snippet" style="color:#22c55e;">✓ ${processStatus}<br><br>${escapeHtml(extractedText.slice(0, 300))}${extractedText.length > 300 ? '...':''}</div></div>`;
+        } else {
+            throw new Error('No text content found in file');
+        }
+    } catch (error) {
+        console.error(`Error processing ${file.name}:`, error);
+        uploadedDocs[idx] = null;
+        fileItem.innerHTML = icon + infoHtml + 
+            `<div class="file-snippet" style="color:#e53e3e;">✗ Error: ${error.message}</div></div>`;
+    }
+
+    // Update the preview
+    if (filePreview.querySelector('.fa-spinner')) {
+        filePreview.innerHTML = ''; // Clear processing message
+    }
+    filePreview.appendChild(fileItem);
+}
+
+// Read text file
+function readTextFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read text file'));
+        reader.readAsText(file);
+    });
+}
+
+// Read PDF file using PDF.js
+function readPdfFile(file) {
+    return new Promise((resolve, reject) => {
+        if (typeof pdfjsLib === 'undefined') {
+            reject(new Error('PDF.js library not loaded yet. Please try again in a moment.'));
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const typedArray = new Uint8Array(e.target.result);
+                const pdf = await pdfjsLib.getDocument(typedArray).promise;
+                let fullText = '';
+                
+                // Extract text from each page
+                for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) { // Limit to first 10 pages
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += `Page ${i}:\n${pageText}\n\n`;
+                }
+                
+                if (fullText.trim()) {
+                    resolve(fullText.trim());
+                } else {
+                    reject(new Error('No text content found in PDF'));
+                }
+            } catch (error) {
+                reject(new Error(`PDF parsing failed: ${error.message}`));
+            }
+        };
+        reader.onerror = () => reject(new Error('Failed to read PDF file'));
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+// Read CSV file using Papa Parse
+function readCsvFile(file) {
+    return new Promise((resolve, reject) => {
+        if (typeof Papa === 'undefined') {
+            reject(new Error('Papa Parse library not loaded yet. Please try again in a moment.'));
+            return;
+        }
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                try {
+                    if (results.errors && results.errors.length > 0) {
+                        console.warn('CSV parsing warnings:', results.errors);
+                    }
+
+                    if (!results.data || results.data.length === 0) {
+                        reject(new Error('No data found in CSV file'));
+                        return;
+                    }
+
+                    // Convert CSV data to readable text format
+                    let textContent = `CSV Data from ${file.name}:\n\n`;
+                    
+                    // Add headers
+                    const headers = Object.keys(results.data[0]);
+                    textContent += `Columns: ${headers.join(', ')}\n\n`;
+                    
+                    // Add sample of data (first 50 rows)
+                    const sampleData = results.data.slice(0, 50);
+                    sampleData.forEach((row, index) => {
+                        textContent += `Row ${index + 1}:\n`;
+                        headers.forEach(header => {
+                            if (row[header]) {
+                                textContent += `${header}: ${row[header]}\n`;
+                            }
+                        });
+                        textContent += '\n';
+                    });
+
+                    // Add summary info
+                    textContent += `\nSummary: ${results.data.length} total rows, ${headers.length} columns`;
+                    
+                    if (results.data.length > 50) {
+                        textContent += `\n(Showing first 50 rows for processing)`;
+                    }
+
+                    resolve(textContent);
+                } catch (error) {
+                    reject(new Error(`CSV processing failed: ${error.message}`));
+                }
+            },
+            error: function(error) {
+                reject(new Error(`CSV parsing failed: ${error.message}`));
+            }
+        });
     });
 }
 
@@ -82,10 +246,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Handle generate button click
 async function handleGenerate() {
-    // Only use .txt files for now
+    // Use all successfully processed files
     const docs = uploadedDocs.filter(Boolean);
     if (docs.length === 0) {
-        showError('Please upload at least one .txt document. PDF/DOCX not supported in browser preview.');
+        showError('Please upload at least one supported file (.txt, .pdf, .csv). Make sure the files contain readable text content.');
         return;
     }
     const targetCount = parseInt(targetQuestions.value);

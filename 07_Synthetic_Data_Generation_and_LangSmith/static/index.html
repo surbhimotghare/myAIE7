@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evol-Instruct API - Synthetic Data Generation</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -36,7 +36,7 @@
                         <span class="card-badge">Professional</span>
                     </div>
                     <p class="description">
-                        Upload up to 3 documents (<strong>.txt</strong>, <strong>.pdf</strong>, <strong>.docx</strong>) to generate sophisticated evolved questions using advanced AI methodology.<br>
+                        Upload up to 3 documents (<strong>.txt</strong>, <strong>.pdf</strong>, <strong>.csv</strong>) to generate sophisticated evolved questions using advanced AI methodology.<br>
                         <span class="evolution-preview simple">Simple Evolution</span> • 
                         <span class="evolution-preview multi-context">Multi-Context</span> • 
                         <span class="evolution-preview reasoning">Reasoning</span>
@@ -49,11 +49,11 @@
                                 Select Documents
                             </label>
                             <div class="file-input-wrapper">
-                                <input type="file" id="fileInput" accept=".txt,.pdf,.docx" multiple>
+                                <input type="file" id="fileInput" accept=".txt,.pdf,.csv" multiple>
                                 <div class="file-input-overlay">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <span>Choose files or drag and drop</span>
-                                    <small>Max 3 files, 2MB each</small>
+                                    <small>Max 3 files, 2MB each • Supports .txt, .pdf, .csv</small>
                                 </div>
                             </div>
                         </div>
@@ -202,6 +202,6 @@
             </div>
         </footer>
     </div>
-    <script src="script.js"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html> 

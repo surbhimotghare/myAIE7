@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import time
 import asyncio
 import logging
@@ -37,6 +39,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # Global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
@@ -60,18 +65,8 @@ async def startup_event():
 
 @app.get("/", tags=["Root"])
 async def root():
-    """Root endpoint - API information"""
-    return {
-        "message": "Evol-Instruct API is running!",
-        "version": "1.0.0",
-        "description": "Generate synthetic data using Evol-Instruct methodology with LangGraph",
-        "endpoints": {
-            "health": "/health",
-            "generate": "/generate",
-            "generate_demo": "/generate-demo",
-            "docs": "/docs"
-        }
-    }
+    """Serve the main frontend page"""
+    return FileResponse("static/index.html")
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():

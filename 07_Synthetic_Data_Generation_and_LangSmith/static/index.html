@@ -17,7 +17,12 @@
                     <i class="fas fa-brain"></i>
                     <h1>Evol-Instruct</h1>
                 </div>
-                <p class="subtitle">Synthetic Data Generation with LangGraph</p>
+                <p class="subtitle">Professional Synthetic Data Generation with LangGraph</p>
+                <div class="feature-highlights">
+                    <span class="highlight-item"><i class="fas fa-cog"></i> Simple Evolution</span>
+                    <span class="highlight-item"><i class="fas fa-link"></i> Multi-Context</span>
+                    <span class="highlight-item"><i class="fas fa-brain"></i> Reasoning</span>
+                </div>
             </div>
         </header>
 
@@ -26,36 +31,64 @@
             <!-- Input Section -->
             <section class="input-section">
                 <div class="card">
-                    <h2><i class="fas fa-upload"></i> Upload Documents</h2>
+                    <div class="card-header">
+                        <h2><i class="fas fa-cloud-upload-alt"></i> Upload Documents</h2>
+                        <span class="card-badge">Professional</span>
+                    </div>
                     <p class="description">
-                        Upload your documents to generate evolved questions using the Evol-Instruct methodology. 
-                        The system will create three types of questions: Simple, Multi-Context, and Reasoning.
+                        Upload up to 3 documents (<strong>.txt</strong>, <strong>.pdf</strong>, <strong>.docx</strong>) to generate sophisticated evolved questions using advanced AI methodology.<br>
+                        <span class="evolution-preview simple">Simple Evolution</span> • 
+                        <span class="evolution-preview multi-context">Multi-Context</span> • 
+                        <span class="evolution-preview reasoning">Reasoning</span>
                     </p>
                     
-                    <div class="input-group">
-                        <label for="documentInput">Document Content:</label>
-                        <textarea 
-                            id="documentInput" 
-                            placeholder="Paste your document content here...&#10;&#10;Example:&#10;Student loans are financial aid that help students pay for college expenses including tuition, books, and living costs. There are two main types: federal student loans and private student loans. Federal loans typically offer better terms, including fixed interest rates, income-driven repayment options, and potential loan forgiveness programs."
-                            rows="8"
-                        ></textarea>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="fileInput">
+                                <i class="fas fa-file-upload"></i>
+                                Select Documents
+                            </label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="fileInput" accept=".txt,.pdf,.docx" multiple>
+                                <div class="file-input-overlay">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose files or drag and drop</span>
+                                    <small>Max 3 files, 2MB each</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="targetQuestions">
+                                <i class="fas fa-sliders-h"></i>
+                                Target Questions
+                            </label>
+                            <div class="number-input-wrapper">
+                                <input type="number" id="targetQuestions" value="9" min="3" max="15">
+                                <span class="input-addon">questions</span>
+                            </div>
+                            <small>3 questions per evolution type (3-15 total)</small>
+                        </div>
                     </div>
-
-                    <div class="input-group">
-                        <label for="targetQuestions">Target Questions:</label>
-                        <input type="number" id="targetQuestions" value="9" min="3" max="15">
-                        <small>3 questions per evolution type (3-15 total)</small>
-                    </div>
-
-                    <div class="button-group">
-                        <button id="generateBtn" class="btn btn-primary">
-                            <i class="fas fa-magic"></i>
-                            Generate Questions
-                        </button>
-                        <button id="demoBtn" class="btn btn-secondary">
-                            <i class="fas fa-play"></i>
-                            Try Demo
-                        </button>
+                    
+                    <div id="filePreview" class="file-preview"></div>
+                    
+                    <div class="action-section">
+                        <div class="button-group">
+                            <button id="generateBtn" class="btn btn-primary">
+                                <i class="fas fa-magic"></i>
+                                Generate Questions
+                                <span class="btn-shine"></span>
+                            </button>
+                            <button id="demoBtn" class="btn btn-secondary">
+                                <i class="fas fa-play"></i>
+                                Try Demo
+                            </button>
+                        </div>
+                        <p class="action-note">
+                            <i class="fas fa-info-circle"></i>
+                            Processing typically takes 30-60 seconds for comprehensive analysis
+                        </p>
                     </div>
                 </div>
             </section>
@@ -64,9 +97,14 @@
             <section id="loadingSection" class="loading-section hidden">
                 <div class="card">
                     <div class="loading-content">
-                        <div class="spinner"></div>
+                        <div class="loading-animation">
+                            <div class="spinner"></div>
+                            <div class="loading-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
                         <h3>Generating Evolved Questions...</h3>
-                        <p>This may take 30-60 seconds depending on document complexity.</p>
+                        <p>Our AI is analyzing your documents and creating sophisticated question variations</p>
                         <div class="progress-bar">
                             <div class="progress-fill"></div>
                         </div>
@@ -78,35 +116,53 @@
             <section id="resultsSection" class="results-section hidden">
                 <div class="card">
                     <div class="results-header">
-                        <h2><i class="fas fa-chart-bar"></i> Generated Results</h2>
+                        <div class="results-title">
+                            <h2><i class="fas fa-chart-line"></i> Generated Results</h2>
+                            <span class="results-badge">Success</span>
+                        </div>
                         <div class="stats">
-                            <span class="stat">
+                            <div class="stat">
                                 <i class="fas fa-question-circle"></i>
-                                <span id="questionCount">0</span> Questions
-                            </span>
-                            <span class="stat">
-                                <i class="fas fa-clock"></i>
-                                <span id="processingTime">0</span>s
-                            </span>
+                                <div class="stat-content">
+                                    <span class="stat-number" id="questionCount">0</span>
+                                    <span class="stat-label">Questions</span>
+                                </div>
+                            </div>
+                            <div class="stat">
+                                <i class="fas fa-stopwatch"></i>
+                                <div class="stat-content">
+                                    <span class="stat-number" id="processingTime">0</span>
+                                    <span class="stat-label">Seconds</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
+                    
                     <!-- Evolution Types Tabs -->
                     <div class="tabs">
                         <button class="tab-btn active" data-tab="simple">
                             <i class="fas fa-cog"></i>
-                            Simple Evolution
+                            <span class="tab-content">
+                                <span class="tab-title">Simple Evolution</span>
+                                <span class="tab-desc">Enhanced & Detailed</span>
+                            </span>
                         </button>
                         <button class="tab-btn" data-tab="multi_context">
-                            <i class="fas fa-link"></i>
-                            Multi-Context
+                            <i class="fas fa-project-diagram"></i>
+                            <span class="tab-content">
+                                <span class="tab-title">Multi-Context</span>
+                                <span class="tab-desc">Cross-Document</span>
+                            </span>
                         </button>
                         <button class="tab-btn" data-tab="reasoning">
                             <i class="fas fa-brain"></i>
-                            Reasoning
+                            <span class="tab-content">
+                                <span class="tab-title">Reasoning</span>
+                                <span class="tab-desc">Logical Analysis</span>
+                            </span>
                         </button>
                     </div>
-
+                    
                     <!-- Questions Container -->
                     <div id="questionsContainer" class="questions-container">
                         <!-- Questions will be populated here -->
@@ -118,10 +174,17 @@
             <section id="errorSection" class="error-section hidden">
                 <div class="card error-card">
                     <div class="error-content">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Error</h3>
-                        <p id="errorMessage">Something went wrong. Please try again.</p>
-                        <button class="btn btn-primary" onclick="hideError()">Try Again</button>
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Something went wrong</h3>
+                        <p id="errorMessage">Please try again or contact support if the issue persists.</p>
+                        <div class="error-actions">
+                            <button class="btn btn-primary" onclick="hideError()">
+                                <i class="fas fa-redo"></i>
+                                Try Again
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -129,11 +192,16 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Powered by <strong>Evol-Instruct</strong> methodology and <strong>LangGraph</strong></p>
-            <p>Based on the <a href="https://arxiv.org/pdf/2304.12244" target="_blank">WizardLM paper</a></p>
+            <div class="footer-content">
+                <p>Powered by <strong>Evol-Instruct</strong> methodology and <strong>LangGraph</strong> framework</p>
+                <p>Based on research from the <a href="https://arxiv.org/pdf/2304.12244" target="_blank">WizardLM paper</a></p>
+                <div class="footer-links">
+                    <a href="/docs" target="_blank"><i class="fas fa-book"></i> API Documentation</a>
+                    <a href="/evolution-types" target="_blank"><i class="fas fa-info-circle"></i> Evolution Types</a>
+                </div>
+            </div>
         </footer>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html> 

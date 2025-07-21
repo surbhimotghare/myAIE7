@@ -26,6 +26,20 @@
             </div>
         </header>
 
+        <!-- OpenAI API Key Section -->
+        <section id="apiKeySection" class="api-key-section">
+            <form id="apiKeyForm" autocomplete="off" onsubmit="return false;">
+                <label for="openaiApiKey"><i class="fas fa-key"></i> OpenAI API Key</label>
+                <div class="api-key-input-wrapper">
+                    <input type="password" id="openaiApiKey" placeholder="sk-..." autocomplete="off">
+                    <button type="button" id="toggleApiKey" title="Show/Hide"><i class="fas fa-eye"></i></button>
+                    <button type="submit" id="saveApiKeyBtn" class="btn btn-secondary" style="margin-left:1rem;">Save</button>
+                    <button type="button" id="clearApiKeyBtn" class="btn btn-secondary" style="margin-left:0.5rem;">Clear</button>
+                </div>
+                <div id="apiKeyStatus" class="api-key-status"></div>
+            </form>
+        </section>
+
         <!-- Main Content -->
         <main class="main-content">
             <!-- Input Section -->
@@ -53,7 +67,7 @@
                                 <div class="file-input-overlay">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <span>Choose files or drag and drop</span>
-                                    <small>Max 3 files, 2MB each • Supports .txt, .pdf, .csv</small>
+                                    <small>Max 10 files, 2MB each • Supports .txt, .pdf, .csv</small>
                                 </div>
                             </div>
                         </div>

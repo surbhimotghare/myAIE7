@@ -17,6 +17,14 @@ const questionsContainer = document.getElementById('questionsContainer');
 const questionCount = document.getElementById('questionCount');
 const processingTime = document.getElementById('processingTime');
 
+// --- OpenAI API Key Logic ---
+const apiKeyInput = document.getElementById('openaiApiKey');
+const apiKeyForm = document.getElementById('apiKeyForm');
+const toggleApiKeyBtn = document.getElementById('toggleApiKey');
+const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+const apiKeyStatus = document.getElementById('apiKeyStatus');
+
 // API configuration
 const API_BASE_URL = window.location.origin; // Will work for both local and deployed
 
@@ -42,11 +50,17 @@ function loadExternalLibraries() {
 // Load libraries when page loads
 document.addEventListener('DOMContentLoaded', loadExternalLibraries);
 
-// File upload and preview logic
+const MAX_FILES = 10;
+
 fileInput.addEventListener('change', handleFileSelect);
 
 function handleFileSelect(e) {
-    const files = Array.from(e.target.files).slice(0, 3); // Max 3 files
+    const files = Array.from(e.target.files);
+    if (files.length > MAX_FILES) {
+        showFileLimitWarning();
+        fileInput.value = '';
+        return;
+    }
     uploadedDocs = [];
     filePreview.innerHTML = '';
 
@@ -60,46 +74,34 @@ function handleFileSelect(e) {
 
     Promise.all(files.map((file, idx) => processFile(file, idx)))
         .then(() => {
+            renderFileList();
             if (uploadedDocs.filter(Boolean).length === 0) {
                 filePreview.innerHTML = '<div style="color:#e53e3e; text-align: center;">No supported files could be processed. Please upload .txt, .pdf, or .csv files.</div>';
             }
         });
 }
 
+function showFileLimitWarning() {
+    filePreview.innerHTML = `<div style="color:#e53e3e; text-align:center; padding:1.5rem; font-weight:600;">You can upload a maximum of ${MAX_FILES} files at a time.</div>`;
+}
+
 async function processFile(file, idx) {
     const ext = file.name.split('.').pop().toLowerCase();
-    const fileItem = document.createElement('div');
-    fileItem.className = 'file-item';
-    
-    // Set icon based on file type
-    let icon = '<i class="fas fa-file-alt file-icon"></i>';
-    if (ext === 'pdf') icon = '<i class="fas fa-file-pdf file-icon" style="color:#e53e3e;"></i>';
-    if (ext === 'csv') icon = '<i class="fas fa-file-csv file-icon" style="color:#22c55e;"></i>';
-
-    let infoHtml = `<div class="file-info">
-        <span class="file-name">${file.name}</span>
-        <span class="file-size">(${(file.size/1024).toFixed(1)} KB)</span>`;
-
+    // Only process metadata, not content
+    let extractedText = '';
     try {
-        let extractedText = '';
-        let processStatus = 'Processing...';
-
         if (ext === 'txt') {
             extractedText = await readTextFile(file);
-            processStatus = 'Processed successfully';
         } else if (ext === 'pdf') {
             extractedText = await readPdfFile(file);
-            processStatus = 'PDF text extracted';
         } else if (ext === 'csv') {
             extractedText = await readCsvFile(file);
-            processStatus = 'CSV data converted to text';
         } else {
             throw new Error(`Unsupported file type: .${ext}`);
         }
-
         if (extractedText && extractedText.trim()) {
             uploadedDocs[idx] = {
-                page_content: extractedText.slice(0, 4000), // Increased limit for PDFs
+                page_content: extractedText.slice(0, 4000),
                 metadata: {
                     source: file.name,
                     size: file.size,
@@ -107,24 +109,59 @@ async function processFile(file, idx) {
                     extension: ext
                 }
             };
-
-            fileItem.innerHTML = icon + infoHtml + 
-                `<div class="file-snippet" style="color:#22c55e;">✓ ${processStatus}<br><br>${escapeHtml(extractedText.slice(0, 300))}${extractedText.length > 300 ? '...':''}</div></div>`;
         } else {
             throw new Error('No text content found in file');
         }
     } catch (error) {
         console.error(`Error processing ${file.name}:`, error);
         uploadedDocs[idx] = null;
-        fileItem.innerHTML = icon + infoHtml + 
-            `<div class="file-snippet" style="color:#e53e3e;">✗ Error: ${error.message}</div></div>`;
     }
+}
 
-    // Update the preview
-    if (filePreview.querySelector('.fa-spinner')) {
-        filePreview.innerHTML = ''; // Clear processing message
+function renderFileList() {
+    filePreview.innerHTML = '';
+    const validDocs = uploadedDocs.filter(Boolean);
+    if (validDocs.length === 0) {
+        filePreview.innerHTML = '<span style="color:#718096;">No files selected.</span>';
+        return;
     }
-    filePreview.appendChild(fileItem);
+    const list = document.createElement('ul');
+    list.className = 'uploaded-doc-list';
+    validDocs.forEach((doc, idx) => {
+        const li = document.createElement('li');
+        li.className = 'uploaded-doc-item';
+        const icon = getFileIcon(doc.metadata.extension);
+        li.innerHTML = `
+            <span class="uploaded-doc-icon">${icon}</span>
+            <span class="uploaded-doc-name">${doc.metadata.source}</span>
+            <span class="uploaded-doc-size">(${(doc.metadata.size/1024).toFixed(1)} KB)</span>
+            <button class="remove-doc-btn" title="Remove" data-idx="${idx}"><i class="fas fa-times"></i></button>
+        `;
+        list.appendChild(li);
+    });
+    filePreview.appendChild(list);
+    // Add event listeners for remove buttons
+    filePreview.querySelectorAll('.remove-doc-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const idx = parseInt(e.currentTarget.getAttribute('data-idx'));
+            removeDoc(idx);
+        });
+    });
+}
+
+function getFileIcon(ext) {
+    if (ext === 'pdf') return '<i class="fas fa-file-pdf" style="color:#e53e3e;"></i>';
+    if (ext === 'csv') return '<i class="fas fa-file-csv" style="color:#22c55e;"></i>';
+    return '<i class="fas fa-file-alt" style="color:#0077b5;"></i>';
+}
+
+function removeDoc(idx) {
+    uploadedDocs.splice(idx, 1);
+    renderFileList();
+    // Also clear the file input if no docs left
+    if (uploadedDocs.filter(Boolean).length === 0) {
+        fileInput.value = '';
+    }
 }
 
 // Read text file
@@ -245,6 +282,63 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// --- OpenAI API Key Logic ---
+function getStoredApiKey() {
+    return localStorage.getItem('openai_api_key') || '';
+}
+function setStoredApiKey(key) {
+    if (key) {
+        localStorage.setItem('openai_api_key', key);
+    } else {
+        localStorage.removeItem('openai_api_key');
+    }
+}
+function updateApiKeyStatus(msg, isError = false) {
+    apiKeyStatus.textContent = msg;
+    apiKeyStatus.className = 'api-key-status' + (isError ? ' error' : '');
+}
+function updateApiKeyInputState() {
+    const key = getStoredApiKey();
+    if (key) {
+        apiKeyInput.value = key;
+        apiKeyInput.type = 'password';
+        updateApiKeyStatus('Key saved locally ✓');
+        saveApiKeyBtn.textContent = 'Update';
+        clearApiKeyBtn.style.display = '';
+    } else {
+        apiKeyInput.value = '';
+        updateApiKeyStatus('No key saved', true);
+        saveApiKeyBtn.textContent = 'Save';
+        clearApiKeyBtn.style.display = 'none';
+    }
+}
+// Show/hide key
+let apiKeyVisible = false;
+toggleApiKeyBtn.addEventListener('click', function() {
+    apiKeyVisible = !apiKeyVisible;
+    apiKeyInput.type = apiKeyVisible ? 'text' : 'password';
+    toggleApiKeyBtn.innerHTML = apiKeyVisible ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+});
+// Save key
+apiKeyForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const key = apiKeyInput.value.trim();
+    if (!key.startsWith('sk-')) {
+        updateApiKeyStatus('Invalid key format', true);
+        return;
+    }
+    setStoredApiKey(key);
+    updateApiKeyStatus('Key saved locally ✓');
+    updateApiKeyInputState();
+});
+// Clear key
+clearApiKeyBtn.addEventListener('click', function() {
+    setStoredApiKey('');
+    updateApiKeyInputState();
+});
+// On load
+updateApiKeyInputState();
+
 // Handle generate button click
 async function handleGenerate() {
     // Use all successfully processed files
@@ -285,6 +379,11 @@ async function callAPIWithProgress(endpoint, requestData) {
                 'Content-Type': 'application/json',
             }
         };
+        // Add OpenAI key header if present
+        const userKey = getStoredApiKey();
+        if (userKey) {
+            options.headers['x-openai-api-key'] = userKey;
+        }
         if (requestData) {
             options.body = JSON.stringify(requestData);
         }

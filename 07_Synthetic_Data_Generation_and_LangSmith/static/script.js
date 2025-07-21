@@ -2,6 +2,7 @@
 let currentResults = null;
 let currentTab = 'simple';
 let uploadedDocs = [];
+let progressEventSource = null;
 
 // DOM elements
 const fileInput = document.getElementById('fileInput');
@@ -261,19 +262,22 @@ async function handleGenerate() {
         documents: docs,
         target_questions: targetCount
     };
-    await callAPI('/generate', requestData);
+    await callAPIWithProgress('/generate', requestData);
 }
 
 // Handle demo button click
 async function handleDemo() {
-    showLoading();
-    await callAPI('/generate-demo', null);
+    await callAPIWithProgress('/generate-demo', null);
 }
 
-// Make API call
-async function callAPI(endpoint, requestData) {
+// Make API call with real-time progress updates
+async function callAPIWithProgress(endpoint, requestData) {
     try {
-        showLoading();
+        showLoadingWithProgress();
+        
+        // Start progress stream first
+        startProgressStream();
+        
         const url = `${API_BASE_URL}${endpoint}`;
         const options = {
             method: 'POST',
@@ -284,25 +288,205 @@ async function callAPI(endpoint, requestData) {
         if (requestData) {
             options.body = JSON.stringify(requestData);
         }
+        
         const response = await fetch(url, options);
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
         }
         const data = await response.json();
+        
+        // Stop progress stream
+        stopProgressStream();
+        
         showResults(data);
     } catch (error) {
         console.error('API Error:', error);
+        stopProgressStream();
         showError(`Failed to generate questions: ${error.message}`);
     }
 }
 
-// Show loading state
-function showLoading() {
+// Start Server-Sent Events for progress updates
+function startProgressStream() {
+    if (progressEventSource) {
+        stopProgressStream();
+    }
+    
+    progressEventSource = new EventSource(`${API_BASE_URL}/progress-stream`);
+    
+    progressEventSource.onmessage = function(event) {
+        try {
+            const progressData = JSON.parse(event.data);
+            updateProgressDisplay(progressData);
+        } catch (error) {
+            console.error('Error parsing progress data:', error);
+        }
+    };
+    
+    progressEventSource.onerror = function(event) {
+        console.error('Progress stream error:', event);
+        // Don't close automatically, let it try to reconnect
+    };
+}
+
+// Stop progress stream
+function stopProgressStream() {
+    if (progressEventSource) {
+        progressEventSource.close();
+        progressEventSource = null;
+    }
+}
+
+// Update progress display with real-time data
+function updateProgressDisplay(progressData) {
+    const progressContainer = document.querySelector('.loading-content');
+    if (!progressContainer) return;
+    
+    const { type, phase, message, details = {} } = progressData;
+    
+    // Update main progress message
+    const mainMessage = progressContainer.querySelector('h3');
+    const subMessage = progressContainer.querySelector('p');
+    
+    if (mainMessage && message) {
+        mainMessage.innerHTML = message;
+    }
+    
+    // Create or update progress steps
+    let stepsContainer = progressContainer.querySelector('.progress-steps');
+    if (!stepsContainer) {
+        stepsContainer = document.createElement('div');
+        stepsContainer.className = 'progress-steps';
+        stepsContainer.style.cssText = `
+            margin-top: 2rem;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+        `;
+        progressContainer.appendChild(stepsContainer);
+    }
+    
+    // Add step to container
+    if (type === 'phase_start' || type === 'step' || type === 'success' || type === 'error' || type === 'warning') {
+        const stepElement = document.createElement('div');
+        stepElement.className = `progress-step ${type}`;
+        stepElement.style.cssText = `
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            animation: slideInLeft 0.3s ease-out;
+            background: ${getStepColor(type)};
+        `;
+        
+        stepElement.innerHTML = `
+            <span style="margin-right: 0.5rem; font-weight: bold;">${getStepIcon(type)}</span>
+            <span>${message}</span>
+            ${details.question_preview ? `<small style="margin-left: 1rem; opacity: 0.8;">${details.question_preview}</small>` : ''}
+        `;
+        
+        stepsContainer.appendChild(stepElement);
+        
+        // Auto-scroll to bottom
+        stepsContainer.scrollTop = stepsContainer.scrollHeight;
+        
+        // Limit number of visible steps (keep last 20)
+        const steps = stepsContainer.querySelectorAll('.progress-step');
+        if (steps.length > 20) {
+            steps[0].remove();
+        }
+    }
+    
+    // Update sub-message with details
+    if (subMessage && details) {
+        let detailText = '';
+        if (details.total_documents) {
+            detailText += `Processing ${details.total_documents} documents`;
+        }
+        if (details.target_questions) {
+            detailText += detailText ? ` • Target: ${details.target_questions} questions` : `Target: ${details.target_questions} questions`;
+        }
+        if (details.total_questions) {
+            detailText += detailText ? ` • Generated: ${details.total_questions}` : `Generated: ${details.total_questions}`;
+        }
+        
+        if (detailText) {
+            subMessage.innerHTML = detailText;
+        }
+    }
+    
+    // Handle completion
+    if (type === 'complete') {
+        setTimeout(() => {
+            stopProgressStream();
+        }, 1000);
+    }
+    
+    // Handle error
+    if (type === 'error') {
+        setTimeout(() => {
+            stopProgressStream();
+            showError(message.replace('❌ ', ''));
+        }, 1000);
+    }
+}
+
+// Get step color based on type
+function getStepColor(type) {
+    const colors = {
+        'phase_start': 'rgba(0, 119, 181, 0.2)',
+        'step': 'rgba(100, 116, 139, 0.1)',
+        'success': 'rgba(34, 197, 94, 0.2)',
+        'error': 'rgba(239, 68, 68, 0.2)',
+        'warning': 'rgba(245, 158, 11, 0.2)',
+        'phase_complete': 'rgba(139, 69, 255, 0.2)'
+    };
+    return colors[type] || 'rgba(100, 116, 139, 0.1)';
+}
+
+// Get step icon based on type
+function getStepIcon(type) {
+    const icons = {
+        'phase_start': '🚀',
+        'step': '⚙️',
+        'success': '✅',
+        'error': '❌',
+        'warning': '⚠️',
+        'phase_complete': '🎯'
+    };
+    return icons[type] || '•';
+}
+
+// Show loading state with progress capability
+function showLoadingWithProgress() {
     hideAllSections();
     loadingSection.classList.remove('hidden');
     generateBtn.disabled = true;
     demoBtn.disabled = true;
+    
+    // Reset loading content to initial state
+    const loadingContent = loadingSection.querySelector('.loading-content');
+    const stepsContainer = loadingContent.querySelector('.progress-steps');
+    if (stepsContainer) {
+        stepsContainer.remove();
+    }
+    
+    // Reset main messages
+    const mainMessage = loadingContent.querySelector('h3');
+    const subMessage = loadingContent.querySelector('p');
+    if (mainMessage) mainMessage.innerHTML = 'Initializing Evol-Instruct Pipeline...';
+    if (subMessage) subMessage.innerHTML = 'Preparing to analyze your documents and generate sophisticated questions';
+}
+
+// Original loading function for fallback
+function showLoading() {
+    showLoadingWithProgress();
 }
 
 // Show results
@@ -324,6 +508,7 @@ function showError(message) {
     document.getElementById('errorMessage').textContent = message;
     generateBtn.disabled = false;
     demoBtn.disabled = false;
+    stopProgressStream(); // Make sure to stop progress stream on error
 }
 
 // Hide error

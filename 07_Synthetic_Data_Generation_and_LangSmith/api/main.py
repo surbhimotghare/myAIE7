@@ -1,21 +1,17 @@
+import logging
+import time
+from typing import Dict, Any, List, Optional
+import json
+import asyncio
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-import time
-import asyncio
-import logging
-import os
-from typing import Dict, Any
+from pydantic import ValidationError
 
-from .models import (
-    EvolInstructRequest, 
-    EvolInstructResponse, 
-    HealthResponse,
-    ErrorResponse
-)
-from .evol_graph import get_evol_graph
+from .models import EvolInstructRequest, EvolInstructResponse, HealthResponse, ErrorResponse, Document
+from .evol_graph import EvolInstructGraph
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -24,16 +20,16 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI(
     title="Evol-Instruct API",
-    description="Generate synthetic data using Evol-Instruct methodology with LangGraph",
+    description="Advanced synthetic data generation using LangGraph and Evol-Instruct methodology",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc",
+    redoc_url="/redoc"
 )
 
-# Add CORS middleware
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=["*"],  # Configure appropriately for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,26 +38,24 @@ app.add_middleware(
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Global exception handler
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    logger.error(f"Global exception: {str(exc)}")
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": f"Internal server error: {str(exc)}", "error_type": "server_error"}
-    )
+# Global variable to store progress updates
+current_progress = {
+    "session_id": None,
+    "steps": [],
+    "current_step": "",
+    "completed": False,
+    "error": None
+}
 
-# Startup event
-@app.on_event("startup")
-async def startup_event():
-    """Initialize the application on startup"""
-    logger.info("Starting Evol-Instruct API...")
+# Progress callback function
+def progress_callback(step_info: Dict[str, Any]):
+    """Callback function to receive progress updates from the graph"""
+    global current_progress
+    current_progress["steps"].append(step_info)
+    current_progress["current_step"] = step_info.get("message", "")
     
-    # Check for required environment variables
-    if not os.getenv("OPENAI_API_KEY"):
-        logger.warning("OPENAI_API_KEY not found in environment variables")
-    
-    logger.info("Evol-Instruct API startup completed")
+    # Log the progress
+    logger.info(f"Progress Update: {step_info}")
 
 @app.get("/", tags=["Root"])
 async def root():
@@ -71,232 +65,209 @@ async def root():
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
     """Health check endpoint"""
+    try:
+        # Try to initialize the graph to check if everything is working
+        graph = EvolInstructGraph()
+        graph_status = "initialized"
+    except Exception as e:
+        logger.error(f"Graph initialization failed: {str(e)}")
+        graph_status = f"error: {str(e)}"
+    
     return HealthResponse(
         status="healthy",
-        timestamp=time.time()
+        timestamp=time.time(),
+        graph_status=graph_status
     )
 
 @app.post("/generate", response_model=EvolInstructResponse, tags=["Generation"])
-async def generate_synthetic_data(request: EvolInstructRequest):
-    """
-    Generate synthetic data using Evol-Instruct method
-    
-    This endpoint takes a list of documents and generates evolved questions using three types:
-    - Simple Evolution: Add constraints, deepen, concretize
-    - Multi-Context Evolution: Questions requiring multiple documents  
-    - Reasoning Evolution: Questions requiring logical inference
-    
-    Returns evolved questions, answers, and relevant contexts.
-    """
-    start_time = time.time()
-    
+async def generate_questions(request: EvolInstructRequest):
+    """Generate evolved questions from documents"""
     try:
         logger.info(f"Received request with {len(request.documents)} documents, target: {request.target_questions}")
         
-        # Validate input
-        if len(request.documents) == 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="At least one document is required"
-            )
+        # Reset progress tracking
+        global current_progress
+        current_progress = {
+            "session_id": f"session_{int(time.time())}",
+            "steps": [],
+            "current_step": "Initializing...",
+            "completed": False,
+            "error": None
+        }
         
-        # Check for empty documents
-        valid_docs = [doc for doc in request.documents if doc.page_content.strip()]
-        if len(valid_docs) == 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="All documents appear to be empty"
-            )
+        start_time = time.time()
         
-        if len(valid_docs) < len(request.documents):
-            logger.warning(f"Filtered out {len(request.documents) - len(valid_docs)} empty documents")
+        # Initialize the graph with progress callback
+        graph = EvolInstructGraph()
         
-        # Convert Pydantic models to dicts for processing
-        documents = [doc.dict() for doc in valid_docs]
-        
-        # Get the Evol-Instruct graph instance
-        evol_graph = get_evol_graph()
-        
-        # Run the evolution process
-        logger.info("Starting Evol-Instruct pipeline...")
-        result = await evol_graph.run(documents)
-        
-        processing_time = time.time() - start_time
-        
-        # Validate results
-        if not result.get("evolved_questions"):
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="No questions were generated. Please check your documents and try again."
-            )
-        
-        logger.info(f"Successfully generated {len(result['evolved_questions'])} questions in {processing_time:.2f}s")
-        
-        return EvolInstructResponse(
-            evolved_questions=result["evolved_questions"],
-            question_answers=result["question_answers"],
-            question_contexts=result["question_contexts"],
-            processing_time=processing_time,
-            total_questions=len(result["evolved_questions"])
+        # Run the pipeline
+        result = await graph.run(
+            request.documents, 
+            target_questions=request.target_questions,
+            progress_callback=progress_callback
         )
-    
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
-        raise
-    
-    except Exception as e:
-        logger.error(f"Error in generate_synthetic_data: {str(e)}")
+        
         processing_time = time.time() - start_time
         
+        # Mark progress as completed
+        current_progress["completed"] = True
+        current_progress["current_step"] = "✅ Pipeline completed successfully!"
+        
+        response = EvolInstructResponse(
+            **result,
+            processing_time=processing_time
+        )
+        
+        logger.info(f"Successfully generated {result['total_questions']} questions in {processing_time:.2f}s")
+        return response
+        
+    except ValidationError as e:
+        logger.error(f"Validation error: {str(e)}")
+        current_progress["error"] = f"Validation error: {str(e)}"
+        current_progress["completed"] = True
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid request data: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"Error in question generation: {str(e)}")
+        current_progress["error"] = str(e)
+        current_progress["completed"] = True
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Processing error after {processing_time:.2f}s: {str(e)}"
+            detail=f"Question generation failed: {str(e)}"
         )
 
 @app.post("/generate-demo", response_model=EvolInstructResponse, tags=["Demo"])
 async def generate_demo():
-    """
-    Demo endpoint with sample loan documents for testing
-    
-    This endpoint uses pre-defined sample documents about student loans to demonstrate
-    the Evol-Instruct methodology. Perfect for testing without providing your own documents.
-    """
-    
+    """Generate demo questions using sample documents"""
     try:
-        # Sample loan documents for demonstration
-        sample_docs = [
-            {
-                "page_content": """Student loans are financial aid that help students pay for college expenses including tuition, books, and living costs. There are two main types: federal student loans and private student loans. Federal loans typically offer better terms, including fixed interest rates, income-driven repayment options, and potential loan forgiveness programs. Students must complete the Free Application for Federal Student Aid (FAFSA) to be considered for federal aid.""",
-                "metadata": {"source": "loan_basics.pdf", "page": 1, "section": "introduction"}
-            },
-            {
-                "page_content": """Direct Subsidized Loans are available to undergraduate students with demonstrated financial need. The government pays the interest while students are in school at least half-time, during grace periods, and during authorized periods of deferment. Direct Unsubsidized Loans are available to undergraduate and graduate students regardless of financial need. Interest accrues from the time the loan is disbursed until it's paid in full.""",
-                "metadata": {"source": "federal_loans.pdf", "page": 2, "section": "loan_types"}
-            },
-            {
-                "page_content": """To qualify for federal student aid, students must meet eligibility requirements including being a U.S. citizen or eligible non-citizen, having a valid Social Security number, and maintaining satisfactory academic progress. Students must also complete the FAFSA annually and may need to provide additional documentation for verification. The Expected Family Contribution (EFC) calculated from FAFSA determines aid eligibility.""",
-                "metadata": {"source": "eligibility.pdf", "page": 3, "section": "requirements"}
-            }
+        # Create sample documents for demo
+        demo_docs = [
+            Document(
+                page_content="FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.6+ based on standard Python type hints. It provides automatic interactive API documentation, automatic data validation, serialization and deserialization.",
+                metadata={"source": "demo_doc_1.txt"}
+            ),
+            Document(
+                page_content="Machine Learning is a subset of artificial intelligence that focuses on algorithms that can learn from data. It includes supervised learning, unsupervised learning, and reinforcement learning approaches.",
+                metadata={"source": "demo_doc_2.txt"}
+            )
         ]
         
-        # Create request object
-        demo_request = EvolInstructRequest(
-            documents=sample_docs,
-            target_questions=9  # 3 per evolution type
+        logger.info("Starting demo Evol-Instruct pipeline...")
+        start_time = time.time()
+        
+        # Initialize the graph
+        graph = EvolInstructGraph()
+        
+        # Run the pipeline
+        result = await graph.run(demo_docs, target_questions=9, progress_callback=progress_callback)
+        
+        processing_time = time.time() - start_time
+        
+        # Mark progress as completed
+        global current_progress
+        current_progress["completed"] = True
+        
+        response = EvolInstructResponse(
+            **result,
+            processing_time=processing_time
         )
         
-        logger.info("Processing demo request with sample loan documents")
+        logger.info(f"Successfully generated {result['total_questions']} demo questions in {processing_time:.2f}s")
+        return response
         
-        # Process using the main generation endpoint
-        return await generate_synthetic_data(demo_request)
-    
     except Exception as e:
-        logger.error(f"Error in generate_demo: {str(e)}")
+        logger.error(f"Error in demo generation: {str(e)}")
+        current_progress["error"] = str(e)
+        current_progress["completed"] = True
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Demo generation error: {str(e)}"
+            detail=f"Demo generation failed: {str(e)}"
         )
 
-@app.get("/status", tags=["Status"])
-async def get_status():
-    """Get detailed API status information"""
-    try:
-        # Check if OpenAI API key is available
-        openai_key_status = "configured" if os.getenv("OPENAI_API_KEY") else "missing"
+@app.get("/progress-stream", tags=["Progress"])
+async def progress_stream():
+    """Server-Sent Events endpoint for real-time progress updates"""
+    async def event_generator():
+        global current_progress
+        last_step_count = 0
         
-        # Try to get the graph instance to check initialization
-        try:
-            evol_graph = get_evol_graph()
-            graph_status = "initialized"
-        except Exception as e:
-            graph_status = f"error: {str(e)}"
-        
-        return {
-            "api_status": "running",
-            "timestamp": time.time(),
-            "environment": {
-                "openai_key": openai_key_status,
-                "evol_graph": graph_status
-            },
-            "endpoints": {
-                "generate": "Available for custom documents",
-                "generate_demo": "Available with sample data",
-                "health": "Health check endpoint"
+        while not current_progress["completed"] and current_progress["error"] is None:
+            # Send new steps if any
+            if len(current_progress["steps"]) > last_step_count:
+                for step in current_progress["steps"][last_step_count:]:
+                    yield f"data: {json.dumps(step)}\n\n"
+                last_step_count = len(current_progress["steps"])
+            
+            # Send current status
+            status_data = {
+                "type": "status",
+                "current_step": current_progress["current_step"],
+                "total_steps": len(current_progress["steps"]),
+                "completed": current_progress["completed"]
             }
-        }
+            yield f"data: {json.dumps(status_data)}\n\n"
+            
+            await asyncio.sleep(0.5)  # Update every 500ms
+        
+        # Send final completion or error
+        if current_progress["error"]:
+            final_data = {
+                "type": "error",
+                "message": current_progress["error"]
+            }
+        else:
+            final_data = {
+                "type": "completed",
+                "message": "✅ All questions generated successfully!",
+                "total_steps": len(current_progress["steps"])
+            }
+        
+        yield f"data: {json.dumps(final_data)}\n\n"
     
-    except Exception as e:
-        logger.error(f"Error in get_status: {str(e)}")
-        return {
-            "api_status": "error",
-            "error": str(e),
-            "timestamp": time.time()
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Cache-Control"
         }
+    )
 
-# Additional utility endpoints
-@app.get("/evolution-types", tags=["Info"])
-async def get_evolution_types():
-    """Get information about the three evolution types"""
-    return {
-        "evolution_types": {
-            "simple": {
-                "description": "Basic evolutions that add constraints, deepen analysis, or increase complexity",
-                "examples": [
-                    "Add specific constraints to make question more challenging",
-                    "Transform to require step-by-step reasoning",
-                    "Add real-world application context"
-                ]
-            },
-            "multi_context": {
-                "description": "Questions that require information from multiple documents or sources",
-                "examples": [
-                    "Compare information across different documents",
-                    "Synthesize concepts from multiple sources",
-                    "Analyze relationships between different document sections"
-                ]
-            },
-            "reasoning": {
-                "description": "Questions requiring logical inference, cause-effect analysis, or strategic thinking",
-                "examples": [
-                    "If-then conditional analysis",
-                    "Cause and effect relationships",
-                    "Problem-solving scenarios"
-                ]
-            }
-        },
-        "methodology": "Based on Evol-Instruct from WizardLM paper (https://arxiv.org/pdf/2304.12244)",
-        "implementation": "LangGraph-based agent workflow"
-    }
+# Exception handlers
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc: HTTPException):
+    """Handle HTTP exceptions"""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(
+            detail=exc.detail,
+            timestamp=time.time()
+        ).dict()
+    )
 
-# Development/debugging endpoints
-@app.get("/debug/sample-request", tags=["Debug"])
-async def get_sample_request():
-    """Get a sample request format for testing"""
-    return {
-        "sample_request": {
-            "documents": [
-                {
-                    "page_content": "Your document content here. This should be substantial text that contains information suitable for question generation.",
-                    "metadata": {
-                        "source": "document1.pdf",
-                        "page": 1,
-                        "section": "introduction"
-                    }
-                },
-                {
-                    "page_content": "Additional document content. Multiple documents enable multi-context evolution questions.",
-                    "metadata": {
-                        "source": "document2.pdf", 
-                        "page": 1,
-                        "section": "details"
-                    }
-                }
-            ],
-            "target_questions": 9
-        },
-        "note": "Use POST /generate with this format, or try GET /generate-demo for a working example"
-    }
+@app.exception_handler(ValidationError)
+async def validation_exception_handler(request, exc: ValidationError):
+    """Handle Pydantic validation errors"""
+    return JSONResponse(
+        status_code=422,
+        content=ErrorResponse(
+            detail=f"Validation error: {str(exc)}",
+            timestamp=time.time()
+        ).dict()
+    )
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+@app.exception_handler(Exception)
+async def general_exception_handler(request, exc: Exception):
+    """Handle general exceptions"""
+    logger.error(f"Unhandled exception: {str(exc)}")
+    return JSONResponse(
+        status_code=500,
+        content=ErrorResponse(
+            detail=f"Internal server error: {str(exc)}",
+            timestamp=time.time()
+        ).dict()
+    ) 

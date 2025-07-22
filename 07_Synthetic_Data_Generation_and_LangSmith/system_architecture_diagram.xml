@@ -1,329 +1,351 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mxfile host="app.diagrams.net" modified="2024-07-21T17:30:00.000Z" agent="5.0" etag="abc123" version="22.1.16" type="device">
-  <diagram name="System Architecture" id="system-architecture">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <diagram name="System Architecture - Clean" id="system-architecture-clean">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         
-        <!-- Frontend Layer -->
-        <mxCell id="frontend-group" value="Frontend Layer" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#e1f5fe;strokeColor=#01579b;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="40" y="40" width="200" height="200" as="geometry" />
+        <!-- Title -->
+        <mxCell id="title" value="Evol-Instruct Synthetic Data Generation - System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="500" y="20" width="400" height="30" as="geometry" />
         </mxCell>
         
-        <mxCell id="ui" value="Modern Web UI&#xa;LinkedIn-inspired Design" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontSize=10;" vertex="1" parent="frontend-group">
-          <mxGeometry x="10" y="40" width="180" height="40" as="geometry" />
+        <!-- Row 1: Frontend -->
+        <mxCell id="frontend-ui" value="Modern Web UI&#xa;LinkedIn-inspired Design" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="80" width="160" height="60" as="geometry" />
         </mxCell>
         
-        <mxCell id="file-upload" value="File Upload&#xa;Drag &amp; Drop Interface" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontSize=10;" vertex="1" parent="frontend-group">
-          <mxGeometry x="10" y="90" width="180" height="40" as="geometry" />
+        <mxCell id="file-upload" value="File Upload Interface&#xa;Drag &amp; Drop + Multi-format" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="80" width="160" height="60" as="geometry" />
         </mxCell>
         
-        <mxCell id="progress" value="Real-time Progress&#xa;SSE Updates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontSize=10;" vertex="1" parent="frontend-group">
-          <mxGeometry x="10" y="140" width="180" height="40" as="geometry" />
+        <mxCell id="progress-display" value="Real-time Progress&#xa;SSE Updates + Visual Feedback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="80" width="160" height="60" as="geometry" />
         </mxCell>
         
-        <mxCell id="results" value="Results Display&#xa;Tabbed Interface" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;fontSize=10;" vertex="1" parent="frontend-group">
-          <mxGeometry x="10" y="190" width="180" height="40" as="geometry" />
+        <mxCell id="results-display" value="Results Display&#xa;Tabbed Interface + Export" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1f5fe;strokeColor=#01579b;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="80" width="160" height="60" as="geometry" />
         </mxCell>
         
-        <!-- API Layer -->
-        <mxCell id="api-group" value="API Layer" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#f3e5f5;strokeColor=#4a148c;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="280" y="40" width="200" height="200" as="geometry" />
+        <!-- Row 2: File Processing -->
+        <mxCell id="pdf-processing" value="PDF Processing&#xa;PDF.js Client-side" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="200" width="120" height="50" as="geometry" />
         </mxCell>
         
-        <mxCell id="fastapi" value="FastAPI Server&#xa;Port 8000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontSize=10;" vertex="1" parent="api-group">
-          <mxGeometry x="10" y="40" width="180" height="40" as="geometry" />
+        <mxCell id="csv-processing" value="CSV Processing&#xa;Papa Parse" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="200" width="120" height="50" as="geometry" />
         </mxCell>
         
-        <mxCell id="auth" value="OpenAI Key&#xa;Authentication" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontSize=10;" vertex="1" parent="api-group">
-          <mxGeometry x="10" y="90" width="180" height="40" as="geometry" />
+        <mxCell id="txt-processing" value="Text Processing&#xa;Direct Content" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="200" width="120" height="50" as="geometry" />
         </mxCell>
         
-        <mxCell id="sse" value="Server-Sent Events&#xa;Progress Streaming" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;fontSize=10;" vertex="1" parent="api-group">
-          <mxGeometry x="10" y="140" width="180" height="40" as="geometry" />
+        <!-- Row 3: API Layer -->
+        <mxCell id="fastapi-server" value="FastAPI Server&#xa;Port 8000 + CORS + Static Files" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="320" width="200" height="60" as="geometry" />
         </mxCell>
         
-        <!-- Processing Layer -->
-        <mxCell id="processing-group" value="Processing Layer" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#e8f5e8;strokeColor=#1b5e20;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="520" y="40" width="200" height="200" as="geometry" />
+        <mxCell id="auth-system" value="Authentication&#xa;OpenAI Key Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="320" width="160" height="60" as="geometry" />
         </mxCell>
         
-        <mxCell id="langgraph" value="LangGraph Workflow&#xa;Evol-Instruct Pipeline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#1b5e20;fontSize=10;" vertex="1" parent="processing-group">
-          <mxGeometry x="10" y="40" width="180" height="40" as="geometry" />
+        <mxCell id="sse-streaming" value="SSE Streaming&#xa;Real-time Progress Updates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#4a148c;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="320" width="160" height="60" as="geometry" />
         </mxCell>
         
-        <mxCell id="llm" value="OpenAI GPT-4o-mini&#xa;Question Generation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#1b5e20;fontSize=10;" vertex="1" parent="processing-group">
-          <mxGeometry x="10" y="90" width="180" height="40" as="geometry" />
+        <!-- Row 4: LangGraph Processing -->
+        <mxCell id="langgraph-core" value="LangGraph Workflow Engine&#xa;Evol-Instruct Pipeline Orchestration" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#1b5e20;strokeWidth=3;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="440" width="250" height="70" as="geometry" />
         </mxCell>
         
-        <mxCell id="embeddings" value="OpenAI Embeddings&#xa;Context Extraction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#1b5e20;fontSize=10;" vertex="1" parent="processing-group">
-          <mxGeometry x="10" y="140" width="180" height="40" as="geometry" />
+        <!-- Row 5: AI Services -->
+        <mxCell id="openai-llm" value="OpenAI GPT-4o-mini&#xa;Question Generation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#1b5e20;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="560" width="150" height="50" as="geometry" />
         </mxCell>
         
-        <!-- File Processing -->
-        <mxCell id="file-group" value="File Processing" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#fff3e0;strokeColor=#e65100;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="40" y="280" width="200" height="200" as="geometry" />
+        <mxCell id="openai-embeddings" value="OpenAI Embeddings&#xa;Context Extraction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e8;strokeColor=#1b5e20;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="560" width="150" height="50" as="geometry" />
         </mxCell>
         
-        <mxCell id="pdf" value="PDF.js&#xa;Client-side PDF parsing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;" vertex="1" parent="file-group">
-          <mxGeometry x="10" y="40" width="180" height="40" as="geometry" />
+        <!-- Row 6: Evolution Pipeline -->
+        <mxCell id="seed-generation" value="Seed Questions&#xa;Initial Generation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="680" width="130" height="50" as="geometry" />
         </mxCell>
         
-        <mxCell id="csv" value="Papa Parse&#xa;CSV processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;" vertex="1" parent="file-group">
-          <mxGeometry x="10" y="90" width="180" height="40" as="geometry" />
+        <mxCell id="simple-evolution" value="Simple Evolution&#xa;Enhanced Detail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="680" width="130" height="50" as="geometry" />
         </mxCell>
         
-        <mxCell id="txt" value="Text processing&#xa;Direct content" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;" vertex="1" parent="file-group">
-          <mxGeometry x="10" y="140" width="180" height="40" as="geometry" />
+        <mxCell id="multi-context" value="Multi-Context&#xa;Cross-Document" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="680" width="130" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="reasoning-evolution" value="Reasoning Evolution&#xa;Logical Analysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="680" width="130" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Row 7: Output Generation -->
+        <mxCell id="evolved-questions" value="Evolved Questions&#xa;3 Types × 3 Each = 9 Total" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#33691e;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="800" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="generated-answers" value="Generated Answers&#xa;Comprehensive Responses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#33691e;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="800" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="relevant-contexts" value="Relevant Contexts&#xa;Document Sections" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#33691e;strokeWidth=2;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="800" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Clean Connections -->
+        
+        <!-- User Interaction Flow -->
+        <mxCell id="conn1" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="frontend-ui" target="file-upload">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="260" y="110" as="sourcePoint" />
+            <mxPoint x="300" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- File Processing Flow -->
+        <mxCell id="conn2" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#e65100;" edge="1" parent="1" source="file-upload" target="pdf-processing">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="140" as="sourcePoint" />
+            <mxPoint x="260" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn3" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#e65100;" edge="1" parent="1" source="file-upload" target="csv-processing">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="140" as="sourcePoint" />
+            <mxPoint x="400" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn4" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#e65100;" edge="1" parent="1" source="file-upload" target="txt-processing">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="140" as="sourcePoint" />
+            <mxPoint x="540" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- API Processing Flow -->
+        <mxCell id="conn5" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="pdf-processing" target="fastapi-server">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="260" y="250" as="sourcePoint" />
+            <mxPoint x="300" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn6" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="csv-processing" target="fastapi-server">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="250" as="sourcePoint" />
+            <mxPoint x="300" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn7" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="txt-processing" target="fastapi-server">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="540" y="250" as="sourcePoint" />
+            <mxPoint x="400" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Core Processing -->
+        <mxCell id="conn8" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#1b5e20;" edge="1" parent="1" source="fastapi-server" target="langgraph-core">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="300" y="380" as="sourcePoint" />
+            <mxPoint x="475" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- AI Services -->
+        <mxCell id="conn9" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#1b5e20;" edge="1" parent="1" source="langgraph-core" target="openai-llm">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="475" y="510" as="sourcePoint" />
+            <mxPoint x="275" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="conn10" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#1b5e20;" edge="1" parent="1" source="langgraph-core" target="openai-embeddings">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="475" y="510" as="sourcePoint" />
+            <mxPoint x="475" y="560" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         
         <!-- Evolution Pipeline -->
-        <mxCell id="evolution-group" value="Evolution Pipeline" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#fce4ec;strokeColor=#880e4f;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="280" y="280" width="200" height="200" as="geometry" />
+        <mxCell id="conn11" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="langgraph-core" target="seed-generation">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="475" y="510" as="sourcePoint" />
+            <mxPoint x="165" y="680" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         
-        <mxCell id="seeds" value="Seed Questions&#xa;Initial generation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontSize=10;" vertex="1" parent="evolution-group">
-          <mxGeometry x="10" y="40" width="180" height="40" as="geometry" />
+        <mxCell id="conn12" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="seed-generation" target="simple-evolution">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="230" y="705" as="sourcePoint" />
+            <mxPoint x="260" y="705" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         
-        <mxCell id="simple" value="Simple Evolution&#xa;Enhanced detail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontSize=10;" vertex="1" parent="evolution-group">
-          <mxGeometry x="10" y="90" width="180" height="40" as="geometry" />
+        <mxCell id="conn13" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="simple-evolution" target="multi-context">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="705" as="sourcePoint" />
+            <mxPoint x="420" y="705" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         
-        <mxCell id="multi" value="Multi-Context&#xa;Cross-document" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontSize=10;" vertex="1" parent="evolution-group">
-          <mxGeometry x="10" y="140" width="180" height="40" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="reasoning" value="Reasoning Evolution&#xa;Logical analysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#880e4f;fontSize=10;" vertex="1" parent="evolution-group">
-          <mxGeometry x="10" y="190" width="180" height="40" as="geometry" />
+        <mxCell id="conn14" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="multi-context" target="reasoning-evolution">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="550" y="705" as="sourcePoint" />
+            <mxPoint x="580" y="705" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         
         <!-- Output Generation -->
-        <mxCell id="output-group" value="Output Generation" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#f1f8e9;strokeColor=#33691e;strokeWidth=2;" vertex="1" parent="1">
-          <mxGeometry x="520" y="280" width="200" height="200" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="questions" value="Evolved Questions&#xa;3 types × 3 each" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#33691e;fontSize=10;" vertex="1" parent="output-group">
-          <mxGeometry x="10" y="40" width="180" height="40" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="answers" value="Generated Answers&#xa;Comprehensive responses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#33691e;fontSize=10;" vertex="1" parent="output-group">
-          <mxGeometry x="10" y="90" width="180" height="40" as="geometry" />
-        </mxCell>
-        
-        <mxCell id="contexts" value="Relevant Contexts&#xa;Document sections" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f8e9;strokeColor=#33691e;fontSize=10;" vertex="1" parent="output-group">
-          <mxGeometry x="10" y="140" width="180" height="40" as="geometry" />
-        </mxCell>
-        
-        <!-- Connections -->
-        <!-- User Flow -->
-        <mxCell id="conn1" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="ui" target="file-upload">
+        <mxCell id="conn15" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#33691e;" edge="1" parent="1" source="reasoning-evolution" target="evolved-questions">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="140" y="120" as="sourcePoint" />
-            <mxPoint x="190" y="70" as="targetPoint" />
+            <mxPoint x="645" y="730" as="sourcePoint" />
+            <mxPoint x="275" y="800" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
-        <mxCell id="conn2" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="file-upload" target="pdf">
+        <mxCell id="conn16" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#33691e;" edge="1" parent="1" source="reasoning-evolution" target="generated-answers">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="140" y="170" as="sourcePoint" />
-            <mxPoint x="190" y="320" as="targetPoint" />
+            <mxPoint x="645" y="730" as="sourcePoint" />
+            <mxPoint x="475" y="800" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
-        <mxCell id="conn3" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="file-upload" target="csv">
+        <mxCell id="conn17" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#33691e;" edge="1" parent="1" source="reasoning-evolution" target="relevant-contexts">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="140" y="170" as="sourcePoint" />
-            <mxPoint x="190" y="370" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn4" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="file-upload" target="txt">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="140" y="170" as="sourcePoint" />
-            <mxPoint x="190" y="420" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <!-- API Flow -->
-        <mxCell id="conn5" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#e65100;" edge="1" parent="1" source="pdf" target="fastapi">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="240" y="320" as="sourcePoint" />
-            <mxPoint x="290" y="80" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn6" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#e65100;" edge="1" parent="1" source="csv" target="fastapi">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="240" y="370" as="sourcePoint" />
-            <mxPoint x="290" y="80" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn7" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#e65100;" edge="1" parent="1" source="txt" target="fastapi">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="240" y="420" as="sourcePoint" />
-            <mxPoint x="290" y="80" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <!-- Processing Flow -->
-        <mxCell id="conn8" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="fastapi" target="langgraph">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="480" y="80" as="sourcePoint" />
-            <mxPoint x="530" y="80" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn9" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="langgraph" target="seeds">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="620" y="80" as="sourcePoint" />
-            <mxPoint x="290" y="320" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn10" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="seeds" target="simple">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="290" y="360" as="sourcePoint" />
-            <mxPoint x="290" y="410" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn11" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="simple" target="multi">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="290" y="460" as="sourcePoint" />
-            <mxPoint x="290" y="510" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn12" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#880e4f;" edge="1" parent="1" source="multi" target="reasoning">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="290" y="560" as="sourcePoint" />
-            <mxPoint x="290" y="610" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <!-- AI Integration -->
-        <mxCell id="conn13" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#1b5e20;" edge="1" parent="1" source="langgraph" target="llm">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="620" y="80" as="sourcePoint" />
-            <mxPoint x="620" y="130" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn14" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#1b5e20;" edge="1" parent="1" source="langgraph" target="embeddings">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="620" y="80" as="sourcePoint" />
-            <mxPoint x="620" y="180" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <!-- Output Flow -->
-        <mxCell id="conn15" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#33691e;" edge="1" parent="1" source="reasoning" target="questions">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="480" y="610" as="sourcePoint" />
-            <mxPoint x="530" y="320" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn16" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#33691e;" edge="1" parent="1" source="reasoning" target="answers">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="480" y="610" as="sourcePoint" />
-            <mxPoint x="530" y="370" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        
-        <mxCell id="conn17" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#33691e;" edge="1" parent="1" source="reasoning" target="contexts">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="480" y="610" as="sourcePoint" />
-            <mxPoint x="530" y="420" as="targetPoint" />
+            <mxPoint x="645" y="730" as="sourcePoint" />
+            <mxPoint x="675" y="800" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
         <!-- Progress Updates -->
-        <mxCell id="conn18" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="langgraph" target="sse">
+        <mxCell id="conn18" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="langgraph-core" target="sse-streaming">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="620" y="80" as="sourcePoint" />
-            <mxPoint x="480" y="180" as="targetPoint" />
+            <mxPoint x="600" y="475" as="sourcePoint" />
+            <mxPoint x="730" y="380" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
-        <mxCell id="conn19" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="sse" target="progress">
+        <mxCell id="conn19" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="sse-streaming" target="progress-display">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="480" y="180" as="sourcePoint" />
-            <mxPoint x="140" y="180" as="targetPoint" />
+            <mxPoint x="730" y="320" as="sourcePoint" />
+            <mxPoint x="580" y="140" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
         <!-- Results Display -->
-        <mxCell id="conn20" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="questions" target="results">
+        <mxCell id="conn20" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="evolved-questions" target="results-display">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="720" y="320" as="sourcePoint" />
-            <mxPoint x="140" y="240" as="targetPoint" />
+            <mxPoint x="275" y="800" as="sourcePoint" />
+            <mxPoint x="780" y="140" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
-        <mxCell id="conn21" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="answers" target="results">
+        <mxCell id="conn21" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="generated-answers" target="results-display">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="720" y="370" as="sourcePoint" />
-            <mxPoint x="140" y="240" as="targetPoint" />
+            <mxPoint x="475" y="800" as="sourcePoint" />
+            <mxPoint x="780" y="140" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
-        <mxCell id="conn22" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="contexts" target="results">
+        <mxCell id="conn22" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#01579b;" edge="1" parent="1" source="relevant-contexts" target="results-display">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="720" y="420" as="sourcePoint" />
-            <mxPoint x="140" y="240" as="targetPoint" />
+            <mxPoint x="675" y="800" as="sourcePoint" />
+            <mxPoint x="780" y="140" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
         <!-- Authentication -->
-        <mxCell id="conn23" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="auth" target="llm">
+        <mxCell id="conn23" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="auth-system" target="openai-llm">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="480" y="130" as="sourcePoint" />
-            <mxPoint x="530" y="130" as="targetPoint" />
+            <mxPoint x="530" y="380" as="sourcePoint" />
+            <mxPoint x="275" y="560" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
-        <mxCell id="conn24" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="auth" target="embeddings">
+        <mxCell id="conn24" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#4a148c;" edge="1" parent="1" source="auth-system" target="openai-embeddings">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="480" y="130" as="sourcePoint" />
-            <mxPoint x="530" y="180" as="targetPoint" />
+            <mxPoint x="530" y="380" as="sourcePoint" />
+            <mxPoint x="475" y="560" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         
-        <!-- Labels -->
-        <mxCell id="label1" value="User Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#01579b;" vertex="1" parent="1">
-          <mxGeometry x="160" y="250" width="60" height="20" as="geometry" />
+        <!-- Layer Labels -->
+        <mxCell id="layer1" value="Frontend Layer" style="text;html=1;strokeColor=none;fillColor=#e1f5fe;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#01579b;" vertex="1" parent="1">
+          <mxGeometry x="50" y="50" width="100" height="20" as="geometry" />
         </mxCell>
         
-        <mxCell id="label2" value="API Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#e65100;" vertex="1" parent="1">
-          <mxGeometry x="260" y="200" width="60" height="20" as="geometry" />
+        <mxCell id="layer2" value="File Processing" style="text;html=1;strokeColor=none;fillColor=#fff3e0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#e65100;" vertex="1" parent="1">
+          <mxGeometry x="50" y="170" width="100" height="20" as="geometry" />
         </mxCell>
         
-        <mxCell id="label3" value="Processing Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#880e4f;" vertex="1" parent="1">
-          <mxGeometry x="400" y="250" width="80" height="20" as="geometry" />
+        <mxCell id="layer3" value="API Layer" style="text;html=1;strokeColor=none;fillColor=#f3e5f5;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#4a148c;" vertex="1" parent="1">
+          <mxGeometry x="50" y="290" width="100" height="20" as="geometry" />
         </mxCell>
         
-        <mxCell id="label4" value="AI Integration" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#1b5e20;" vertex="1" parent="1">
-          <mxGeometry x="580" y="150" width="80" height="20" as="geometry" />
+        <mxCell id="layer4" value="LangGraph Core" style="text;html=1;strokeColor=none;fillColor=#e8f5e8;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="1">
+          <mxGeometry x="50" y="410" width="100" height="20" as="geometry" />
         </mxCell>
         
-        <mxCell id="label5" value="Output Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#33691e;" vertex="1" parent="1">
-          <mxGeometry x="500" y="500" width="80" height="20" as="geometry" />
+        <mxCell id="layer5" value="AI Services" style="text;html=1;strokeColor=none;fillColor=#e8f5e8;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#1b5e20;" vertex="1" parent="1">
+          <mxGeometry x="50" y="530" width="100" height="20" as="geometry" />
         </mxCell>
         
-        <mxCell id="label6" value="Progress Updates" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#4a148c;" vertex="1" parent="1">
-          <mxGeometry x="300" y="150" width="100" height="20" as="geometry" />
+        <mxCell id="layer6" value="Evolution Pipeline" style="text;html=1;strokeColor=none;fillColor=#fce4ec;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#880e4f;" vertex="1" parent="1">
+          <mxGeometry x="50" y="650" width="100" height="20" as="geometry" />
         </mxCell>
         
-        <mxCell id="label7" value="Results Display" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#01579b;" vertex="1" parent="1">
-          <mxGeometry x="400" y="350" width="100" height="20" as="geometry" />
+        <mxCell id="layer7" value="Output Generation" style="text;html=1;strokeColor=none;fillColor=#f1f8e9;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#33691e;" vertex="1" parent="1">
+          <mxGeometry x="50" y="770" width="100" height="20" as="geometry" />
         </mxCell>
         
-        <mxCell id="label8" value="Authentication" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#4a148c;" vertex="1" parent="1">
-          <mxGeometry x="500" y="110" width="80" height="20" as="geometry" />
+        <!-- Flow Direction Indicators -->
+        <mxCell id="flow-indicator" value="Data Flow Direction" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="50" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-arrow" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1000" y="80" as="sourcePoint" />
+            <mxPoint x="1000" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-title" value="Component Legend" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="100" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-frontend" value="Frontend Components" style="text;html=1;strokeColor=#01579b;fillColor=#e1f5fe;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#01579b;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="130" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-file" value="File Processing" style="text;html=1;strokeColor=#e65100;fillColor=#fff3e0;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#e65100;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="160" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-api" value="API Components" style="text;html=1;strokeColor=#4a148c;fillColor=#f3e5f5;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#4a148c;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="190" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-processing" value="AI Processing" style="text;html=1;strokeColor=#1b5e20;fillColor=#e8f5e8;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#1b5e20;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="220" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-evolution" value="Evolution Pipeline" style="text;html=1;strokeColor=#880e4f;fillColor=#fce4ec;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#880e4f;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="250" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-output" value="Output Generation" style="text;html=1;strokeColor=#33691e;fillColor=#f1f8e9;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#33691e;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="280" width="120" height="20" as="geometry" />
         </mxCell>
         
       </root>

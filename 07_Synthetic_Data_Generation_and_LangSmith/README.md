@@ -22,7 +22,105 @@ A sophisticated synthetic data generation application built with **Evol-Instruct
 - **⚡ FastAPI Backend**: High-performance async API server
 - **🎨 Responsive Design**: Works seamlessly on desktop and mobile
 
-## 🏗️ Architecture
+## ��️ Architecture
+
+### System Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        UI[Modern Web UI<br/>LinkedIn-inspired Design]
+        FileUpload[File Upload<br/>Drag & Drop Interface]
+        Progress[Real-time Progress<br/>SSE Updates]
+        Results[Results Display<br/>Tabbed Interface]
+    end
+
+    subgraph "API Layer"
+        FastAPI[FastAPI Server<br/>Port 8000]
+        Auth[OpenAI Key<br/>Authentication]
+        SSE[Server-Sent Events<br/>Progress Streaming]
+    end
+
+    subgraph "Processing Layer"
+        LangGraph[LangGraph Workflow<br/>Evol-Instruct Pipeline]
+        LLM[OpenAI GPT-4o-mini<br/>Question Generation]
+        Embeddings[OpenAI Embeddings<br/>Context Extraction]
+    end
+
+    subgraph "File Processing"
+        PDF[PDF.js<br/>Client-side PDF parsing]
+        CSV[Papa Parse<br/>CSV processing]
+        TXT[Text processing<br/>Direct content]
+    end
+
+    subgraph "Evolution Pipeline"
+        Seeds[Seed Questions<br/>Initial generation]
+        Simple[Simple Evolution<br/>Enhanced detail]
+        Multi[Multi-Context<br/>Cross-document]
+        Reasoning[Reasoning Evolution<br/>Logical analysis]
+    end
+
+    subgraph "Output Generation"
+        Questions[Evolved Questions<br/>3 types × 3 each]
+        Answers[Generated Answers<br/>Comprehensive responses]
+        Contexts[Relevant Contexts<br/>Document sections]
+    end
+
+    %% User Flow
+    UI --> FileUpload
+    FileUpload --> PDF
+    FileUpload --> CSV
+    FileUpload --> TXT
+    
+    %% API Flow
+    PDF --> FastAPI
+    CSV --> FastAPI
+    TXT --> FastAPI
+    
+    %% Processing Flow
+    FastAPI --> LangGraph
+    LangGraph --> Seeds
+    Seeds --> Simple
+    Simple --> Multi
+    Multi --> Reasoning
+    
+    %% AI Integration
+    LangGraph --> LLM
+    LangGraph --> Embeddings
+    
+    %% Output Flow
+    Reasoning --> Questions
+    Reasoning --> Answers
+    Reasoning --> Contexts
+    
+    %% Progress Updates
+    LangGraph --> SSE
+    SSE --> Progress
+    
+    %% Results Display
+    Questions --> Results
+    Answers --> Results
+    Contexts --> Results
+    
+    %% Authentication
+    Auth --> LLM
+    Auth --> Embeddings
+
+    %% Styling
+    classDef frontend fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef api fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef processing fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef files fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef evolution fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef output fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+
+    class UI,FileUpload,Progress,Results frontend
+    class FastAPI,Auth,SSE api
+    class LangGraph,LLM,Embeddings processing
+    class PDF,CSV,TXT files
+    class Seeds,Simple,Multi,Reasoning evolution
+    class Questions,Answers,Contexts output
+```
 
 ### Evolution Types
 

@@ -1,310 +1,302 @@
-# 🧠 Evol-Instruct API
+# Evol-Instruct Synthetic Data Generation App
 
-A FastAPI-based implementation of the **Evol-Instruct methodology** from the WizardLM paper, using **LangGraph** for agent-based synthetic data generation. This API generates evolved questions, answers, and contexts from your documents using three sophisticated evolution strategies.
+<p align="center">
+  <img src="https://img.shields.io/badge/FastAPI-0.116.1-009688?style=for-the-badge&logo=fastapi" alt="FastAPI">
+  <img src="https://img.shields.io/badge/LangGraph-0.5.4-FF6B6B?style=for-the-badge&logo=python" alt="LangGraph">
+  <img src="https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991?style=for-the-badge&logo=openai" alt="OpenAI">
+  <img src="https://img.shields.io/badge/React-Modern%20UI-61DAFB?style=for-the-badge&logo=react" alt="Modern UI">
+</p>
 
-## 🌟 Features
+## 🚀 Overview
 
-### **Three Evolution Types**
-- **🔧 Simple Evolution**: Adds constraints, deepens analysis, increases complexity
-- **🔗 Multi-Context Evolution**: Creates questions requiring multiple documents
-- **🧠 Reasoning Evolution**: Generates logical inference and cause-effect questions
+A sophisticated synthetic data generation application built with **Evol-Instruct methodology** from the WizardLM paper. This app uses LangGraph to orchestrate complex AI workflows that generate high-quality question-answer pairs through multiple evolution types.
 
-### **Complete Output Format**
-- ✅ **Evolved Questions** with IDs and evolution types
-- ✅ **Generated Answers** based on document context
-- ✅ **Relevant Contexts** extracted from source documents
+### ✨ Key Features
 
-### **Production Ready**
-- 🚀 **FastAPI** with automatic documentation
-- 🌐 **CORS** enabled for web integration
-- 📊 **Structured logging** and error handling
-- 🔄 **Health checks** and status monitoring
+- **🎯 Evol-Instruct Pipeline**: Advanced synthetic data generation using LangGraph
+- **🌐 Modern Web Interface**: LinkedIn-inspired, professional UI with real-time progress
+- **📁 Multi-File Support**: Upload and process `.txt`, `.pdf`, and `.csv` files
+- **🔑 OpenAI Integration**: User-configurable API keys with secure storage
+- **📊 Real-Time Progress**: Server-Sent Events (SSE) for live progress updates
+- **📚 Comprehensive API**: Full REST API with interactive documentation
+- **⚡ FastAPI Backend**: High-performance async API server
+- **🎨 Responsive Design**: Works seamlessly on desktop and mobile
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TD
-    A[Documents] --> B[Seed Generation]
-    B --> C[Simple Evolution]
-    B --> D[Multi-Context Evolution] 
-    B --> E[Reasoning Evolution]
-    C --> F[Answer Generation]
-    D --> F
-    E --> F
-    F --> G[Context Extraction]
-    G --> H[Final Output]
-```
+### Evolution Types
+
+1. **Simple Evolution** 🎯
+   - Enhances questions with more detail and complexity
+   - Maintains core meaning while adding sophistication
+
+2. **Multi-Context Evolution** 🔗
+   - Creates questions spanning multiple documents
+   - Enables comprehensive cross-document analysis
+
+3. **Reasoning Evolution** 🧠
+   - Generates questions requiring logical reasoning
+   - Promotes analytical thinking and problem-solving
+
+### Tech Stack
+
+- **Backend**: FastAPI + Uvicorn + LangGraph + LangChain
+- **Frontend**: Modern HTML/CSS/JavaScript with Font Awesome
+- **AI**: OpenAI GPT-4o-mini for question generation
+- **File Processing**: PDF.js + Papa Parse for client-side parsing
+- **Deployment**: Vercel-ready configuration
 
 ## 🚀 Quick Start
 
-### **1. Local Development**
+### Prerequisites
 
+- Python 3.8+
+- OpenAI API key (optional - server has default key)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd s07-bonus-evol-instruct-app
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Start the server**
+   ```bash
+   python3 -c "from api.main import app; import uvicorn; uvicorn.run(app, host='0.0.0.0', port=8000)"
+   ```
+
+5. **Open your browser**
+   ```
+   http://localhost:8000
+   ```
+
+## 📖 Usage
+
+### Web Interface
+
+1. **Upload Documents** (up to 10 files)
+   - Supported formats: `.txt`, `.pdf`, `.csv`
+   - Max file size: 2MB each
+   - Drag & drop or click to select
+
+2. **Configure Settings**
+   - Set target question count (3-15)
+   - Add your OpenAI API key (optional)
+
+3. **Generate Questions**
+   - Click "Generate Questions" or "Try Demo"
+   - Watch real-time progress updates
+   - View results organized by evolution type
+
+### API Usage
+
+#### Health Check
 ```bash
-# Clone and setup
-git clone <your-repo>
-cd evol-instruct-api
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variable
-export OPENAI_API_KEY="your-openai-api-key"
-
-# Run locally
-uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+curl http://localhost:8000/health
 ```
 
-Visit `http://localhost:8000/docs` for interactive API documentation!
-
-### **2. Deploy to Vercel**
-
+#### Generate Questions
 ```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel
-
-# Set environment variable in Vercel dashboard
-# OPENAI_API_KEY = "your-openai-api-key"
-```
-
-## 📡 API Endpoints
-
-### **Main Generation Endpoint**
-
-```bash
-POST /generate
-```
-
-**Request Body:**
-```json
-{
-  "documents": [
-    {
-      "page_content": "Your document content here...",
-      "metadata": {"source": "doc1.pdf", "page": 1}
-    }
-  ],
-  "target_questions": 9
-}
-```
-
-**Response:**
-```json
-{
-  "evolved_questions": [
-    {
-      "id": "simple_0",
-      "question": "What are the specific eligibility requirements...",
-      "evolution_type": "simple",
-      "parent_id": "seed_0"
-    }
-  ],
-  "question_answers": [
-    {
-      "question_id": "simple_0",
-      "answer": "The eligibility requirements include..."
-    }
-  ],
-  "question_contexts": [
-    {
-      "question_id": "simple_0", 
-      "contexts": ["Relevant document excerpts..."]
-    }
-  ],
-  "processing_time": 15.3,
-  "total_questions": 9
-}
-```
-
-### **Demo Endpoint**
-
-```bash
-POST /generate-demo
-```
-
-Try the API immediately with pre-loaded student loan documents!
-
-### **Utility Endpoints**
-
-- `GET /` - API information
-- `GET /health` - Health check
-- `GET /status` - Detailed status
-- `GET /evolution-types` - Evolution methodology info
-- `GET /debug/sample-request` - Sample request format
-
-## 🔬 Evolution Methodology
-
-Based on the [WizardLM paper](https://arxiv.org/pdf/2304.12244), our implementation includes:
-
-### **Simple Evolution Operations**
-- **Add Constraints**: "Additionally, consider specific limitations..."
-- **Deepen**: "Provide comprehensive analysis of..."
-- **Concretize**: Replace abstract concepts with specific examples
-- **Reasoning Steps**: "First analyze X, then consider Y..."
-- **Real-world Context**: Add practical application scenarios
-
-### **Multi-Context Evolution**
-- Identifies related documents using semantic analysis
-- Creates comparative questions across documents
-- Synthesizes information from 2-4 sources
-- Generates cross-referential analysis questions
-
-### **Reasoning Evolution**
-- **Conditional Logic**: "If X occurs, what are implications for Y?"
-- **Cause-Effect**: "What consequences would result from..."
-- **Strategic Thinking**: "Given constraints A and B, recommend..."
-- **Inference**: Questions requiring logical deduction
-
-## 🔧 Technical Implementation
-
-### **LangGraph Workflow**
-- **State Management**: Tracks documents, questions, and evolution progress
-- **Node-based Processing**: Each evolution type as separate node
-- **Error Handling**: Graceful failure recovery and logging
-- **Async Processing**: Non-blocking execution for better performance
-
-### **Key Components**
-- **Document Processing**: Chunking and initial question generation
-- **Evolution Router**: Distributes processing across evolution types
-- **Quality Filter**: Validates question clarity and answerability
-- **Context Extraction**: Maps questions to relevant document sections
-
-## 📊 Example Usage
-
-### **Python Client**
-
-```python
-import requests
-
-# Custom documents
-response = requests.post("https://your-api.vercel.app/generate", json={
-    "documents": [
-        {
-            "page_content": "Your document content...",
-            "metadata": {"source": "doc1.pdf"}
-        }
-    ],
-    "target_questions": 9
-})
-
-result = response.json()
-print(f"Generated {result['total_questions']} questions in {result['processing_time']:.1f}s")
-```
-
-### **cURL**
-
-```bash
-# Demo endpoint
-curl -X POST "https://your-api.vercel.app/generate-demo"
-
-# Custom documents
-curl -X POST "https://your-api.vercel.app/generate" \
+curl -X POST "http://localhost:8000/generate" \
   -H "Content-Type: application/json" \
+  -H "x-openai-api-key: your-key" \
   -d '{
     "documents": [
       {
-        "page_content": "Your content here...",
-        "metadata": {"source": "test.pdf"}
+        "page_content": "Your document content...",
+        "metadata": {
+          "source": "document.txt",
+          "size": 1024,
+          "type": "text/plain",
+          "extension": "txt"
+        }
       }
     ],
     "target_questions": 9
   }'
 ```
 
-## ⚡ Performance
-
-- **Processing Time**: ~15-30 seconds for 9 questions
-- **Scalability**: Handles 1-5 documents efficiently
-- **Resource Usage**: Optimized for Vercel serverless limits
-- **Error Recovery**: Graceful handling of API failures
-
-## 🛠️ Configuration
-
-### **Environment Variables**
+#### Demo Generation
 ```bash
-OPENAI_API_KEY="your-openai-api-key"  # Required
+curl -X POST "http://localhost:8000/generate-demo"
 ```
 
-### **Request Limits**
-- **Documents**: 1-5 documents per request
-- **Target Questions**: 3-15 questions (3 per evolution type)
-- **Document Size**: ~2000 characters per document for optimal performance
+## 📚 API Documentation
 
-## 🔍 Monitoring & Debugging
+Visit `http://localhost:8000/docs` for comprehensive API documentation including:
+- All endpoints with request/response examples
+- Authentication guide
+- Error handling
+- Best practices
+- Usage examples
 
-### **Logging**
-- Detailed request/response logging
-- Evolution step tracking
-- Error categorization and reporting
+## 🔧 Configuration
 
-### **Health Checks**
+### Environment Variables
+
+- `OPENAI_API_KEY`: Your OpenAI API key (optional - server has default)
+
+### Upload Limits
+
+- **Maximum files**: 10 documents
+- **File size**: 2MB per file
+- **Supported formats**: `.txt`, `.pdf`, `.csv`
+
+## 🎯 Features in Detail
+
+### Real-Time Progress Tracking
+- Server-Sent Events (SSE) for live updates
+- Visual progress indicators
+- Step-by-step evolution tracking
+- Error handling with user feedback
+
+### Multi-File Processing
+- **Text files**: Direct content extraction
+- **PDF files**: Client-side parsing with PDF.js
+- **CSV files**: Structured data extraction with Papa Parse
+- **File management**: Upload, preview, and remove documents
+
+### OpenAI Integration
+- **User keys**: Secure localStorage storage
+- **Server fallback**: Default API key for demo
+- **Key validation**: Format checking and error handling
+- **Privacy**: Keys never sent unless explicitly provided
+
+### Modern UI/UX
+- **Responsive design**: Works on all devices
+- **Professional styling**: LinkedIn-inspired interface
+- **Interactive elements**: Hover effects and animations
+- **Accessibility**: Proper contrast and keyboard navigation
+
+## 🚀 Deployment
+
+### Vercel Deployment
+
+The app is configured for Vercel deployment:
+
+1. **Connect repository** to Vercel
+2. **Set environment variables**:
+   - `OPENAI_API_KEY`: Your OpenAI API key
+3. **Deploy**: Automatic deployment on push to main
+
+### Local Development
+
 ```bash
-GET /health      # Simple health check
-GET /status      # Detailed system status
+# Development server with auto-reload
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+
+# Production server
+uvicorn api.main:app --host 0.0.0.0 --port 8000
 ```
 
-### **Error Handling**
-- Input validation with clear error messages
-- Graceful degradation on API failures
-- Comprehensive error logging for debugging
+## 🧪 Testing
 
-## 🚀 Deployment Options
+### API Testing
+```bash
+# Test health endpoint
+curl http://localhost:8000/health
 
-### **Vercel (Recommended)**
-- Zero configuration deployment
-- Automatic scaling
-- Built-in monitoring
+# Test demo generation
+curl -X POST http://localhost:8000/generate-demo
 
-### **Other Platforms**
-- **Railway**: `railway deploy`
-- **Render**: Connect GitHub repository
-- **AWS Lambda**: Use Mangum adapter
-- **Docker**: `docker build -t evol-instruct .`
-
-## 📝 Development
-
-### **Project Structure**
+# Test with custom documents
+curl -X POST http://localhost:8000/generate \
+  -H "Content-Type: application/json" \
+  -d '{"documents": [...], "target_questions": 9}'
 ```
-evol-instruct-api/
-├── api/
+
+### Frontend Testing
+1. Open `http://localhost:8000`
+2. Upload test documents
+3. Generate questions
+4. Verify real-time progress
+5. Check all evolution types
+
+## 📁 Project Structure
+
+```
+s07-bonus-evol-instruct-app/
+├── api/                    # Backend API
 │   ├── __init__.py
-│   ├── main.py          # FastAPI application
-│   ├── models.py        # Pydantic models
-│   └── evol_graph.py    # LangGraph implementation
-├── requirements.txt
-├── vercel.json
-└── README.md
+│   ├── main.py            # FastAPI application
+│   ├── models.py          # Pydantic models
+│   └── evol_graph.py      # LangGraph workflow
+├── static/                # Frontend assets
+│   ├── index.html         # Main application
+│   ├── styles.css         # Modern styling
+│   └── script.js          # Interactive logic
+├── data/                  # Sample documents
+├── requirements.txt       # Python dependencies
+├── vercel.json           # Deployment config
+└── README.md             # This file
 ```
 
-### **Running Tests**
-```bash
-# Install test dependencies
-pip install pytest httpx
+## 🔬 Technical Details
 
-# Run tests
-pytest
-```
+### LangGraph Workflow
+
+The Evol-Instruct pipeline consists of:
+
+1. **Document Processing**: Extract and prepare content
+2. **Seed Generation**: Create initial questions
+3. **Simple Evolution**: Enhance with detail and complexity
+4. **Multi-Context Evolution**: Cross-document analysis
+5. **Reasoning Evolution**: Logical reasoning questions
+6. **Answer Generation**: Create comprehensive answers
+7. **Context Extraction**: Identify relevant document sections
+
+### Real-Time Progress
+
+- **SSE Implementation**: Server-Sent Events for live updates
+- **Progress Types**: `phase_start`, `step`, `success`, `error`, `complete`
+- **Visual Feedback**: Color-coded progress indicators
+- **Error Handling**: Graceful failure with user notifications
+
+### File Processing
+
+- **Client-side parsing**: Reduces server load
+- **Multiple formats**: Unified processing pipeline
+- **Error handling**: Graceful failure for unsupported files
+- **Size limits**: Prevents memory issues
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🔗 References
+## 🙏 Acknowledgments
 
-- **WizardLM Paper**: [Evol-Instruct Methodology](https://arxiv.org/pdf/2304.12244)
-- **LangGraph**: [Agent Framework Documentation](https://python.langchain.com/docs/langgraph)
-- **FastAPI**: [Modern API Framework](https://fastapi.tiangolo.com/)
+- **Evol-Instruct Methodology**: Based on the [WizardLM paper](https://arxiv.org/pdf/2304.12244)
+- **LangGraph**: For the powerful workflow orchestration
+- **FastAPI**: For the high-performance API framework
+- **OpenAI**: For the advanced language models
+
+## 📞 Support
+
+For questions or issues:
+1. Check the API documentation at `/docs`
+2. Review the code comments
+3. Open an issue on GitHub
 
 ---
 
-**🌟 Star this repository if you find it helpful!** 
+**Built with ❤️ using Evol-Instruct methodology and modern web technologies**

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system-architecture>
+    <metadata>
+        <title>Evol-Instruct Synthetic Data Generation System Architecture</title>
+        <description>Complete system architecture showing the flow from user input to generated questions using Evol-Instruct methodology</description>
+        <version>1.0</version>
+        <created>2024-07-21</created>
+    </metadata>
+
+    <layers>
+        <layer id="frontend" name="Frontend Layer" color="#e1f5fe" stroke="#01579b">
+            <components>
+                <component id="ui" name="Modern Web UI" description="LinkedIn-inspired Design">
+                    <type>user-interface</type>
+                    <technologies>HTML, CSS, JavaScript, Font Awesome</technologies>
+                </component>
+                <component id="file-upload" name="File Upload" description="Drag & Drop Interface">
+                    <type>input-handler</type>
+                    <technologies>HTML5 File API, Drag & Drop</technologies>
+                    <limits>
+                        <max-files>10</max-files>
+                        <max-size>2MB</max-size>
+                        <supported-formats>txt, pdf, csv</supported-formats>
+                    </limits>
+                </component>
+                <component id="progress" name="Real-time Progress" description="SSE Updates">
+                    <type>progress-tracker</type>
+                    <technologies>Server-Sent Events, EventSource</technologies>
+                </component>
+                <component id="results" name="Results Display" description="Tabbed Interface">
+                    <type>output-display</type>
+                    <technologies>Tabbed UI, Dynamic Content</technologies>
+                </component>
+            </components>
+        </layer>
+
+        <layer id="api" name="API Layer" color="#f3e5f5" stroke="#4a148c">
+            <components>
+                <component id="fastapi" name="FastAPI Server" description="Port 8000">
+                    <type>web-server</type>
+                    <technologies>FastAPI, Uvicorn, ASGI</technologies>
+                    <endpoints>
+                        <endpoint path="/" method="GET" description="Serve frontend"/>
+                        <endpoint path="/health" method="GET" description="Health check"/>
+                        <endpoint path="/generate" method="POST" description="Generate questions"/>
+                        <endpoint path="/generate-demo" method="POST" description="Demo generation"/>
+                        <endpoint path="/progress-stream" method="GET" description="SSE progress"/>
+                        <endpoint path="/docs" method="GET" description="API documentation"/>
+                    </endpoints>
+                </component>
+                <component id="auth" name="OpenAI Key Authentication" description="Key Management">
+                    <type>authentication</type>
+                    <technologies>OpenAI API, Header-based auth</technologies>
+                    <features>
+                        <feature>User-provided keys</feature>
+                        <feature>Server fallback</feature>
+                        <feature>Secure storage</feature>
+                    </features>
+                </component>
+                <component id="sse" name="Server-Sent Events" description="Progress Streaming">
+                    <type>real-time-communication</type>
+                    <technologies>SSE, EventSource</technologies>
+                    <event-types>
+                        <event type="phase_start" description="Start of processing phase"/>
+                        <event type="step" description="Individual processing step"/>
+                        <event type="success" description="Successful completion"/>
+                        <event type="error" description="Error during processing"/>
+                        <event type="complete" description="All processing completed"/>
+                    </event-types>
+                </component>
+            </components>
+        </layer>
+
+        <layer id="processing" name="Processing Layer" color="#e8f5e8" stroke="#1b5e20">
+            <components>
+                <component id="langgraph" name="LangGraph Workflow" description="Evol-Instruct Pipeline">
+                    <type>workflow-orchestrator</type>
+                    <technologies>LangGraph, LangChain</technologies>
+                    <pipeline-steps>
+                        <step order="1" name="document-processing" description="Extract and prepare content"/>
+                        <step order="2" name="seed-generation" description="Create initial questions"/>
+                        <step order="3" name="simple-evolution" description="Enhance with detail"/>
+                        <step order="4" name="multi-context-evolution" description="Cross-document analysis"/>
+                        <step order="5" name="reasoning-evolution" description="Logical reasoning"/>
+                        <step order="6" name="answer-generation" description="Create comprehensive answers"/>
+                        <step order="7" name="context-extraction" description="Identify relevant sections"/>
+                    </pipeline-steps>
+                </component>
+                <component id="llm" name="OpenAI GPT-4o-mini" description="Question Generation">
+                    <type>language-model</type>
+                    <technologies>OpenAI API, GPT-4o-mini</technologies>
+                    <capabilities>
+                        <capability>Question generation</capability>
+                        <capability>Answer creation</capability>
+                        <capability>Text enhancement</capability>
+                    </capabilities>
+                </component>
+                <component id="embeddings" name="OpenAI Embeddings" description="Context Extraction">
+                    <type>embedding-model</type>
+                    <technologies>OpenAI Embeddings API</technologies>
+                    <capabilities>
+                        <capability>Semantic similarity</capability>
+                        <capability>Context matching</capability>
+                        <capability>Document retrieval</capability>
+                    </capabilities>
+                </component>
+            </components>
+        </layer>
+
+        <layer id="file-processing" name="File Processing" color="#fff3e0" stroke="#e65100">
+            <components>
+                <component id="pdf" name="PDF.js" description="Client-side PDF parsing">
+                    <type>file-parser</type>
+                    <technologies>PDF.js, JavaScript</technologies>
+                    <features>
+                        <feature>Text extraction</feature>
+                        <feature>Page-by-page processing</feature>
+                        <feature>Client-side parsing</feature>
+                    </features>
+                </component>
+                <component id="csv" name="Papa Parse" description="CSV processing">
+                    <type>file-parser</type>
+                    <technologies>Papa Parse, JavaScript</technologies>
+                    <features>
+                        <feature>Header detection</feature>
+                        <feature>Data structure conversion</feature>
+                        <feature>Error handling</feature>
+                    </features>
+                </component>
+                <component id="txt" name="Text Processing" description="Direct content handling">
+                    <type>file-parser</type>
+                    <technologies>FileReader API, JavaScript</technologies>
+                    <features>
+                        <feature>Direct text reading</feature>
+                        <feature>Encoding handling</feature>
+                        <feature>Size validation</feature>
+                    </features>
+                </component>
+            </components>
+        </layer>
+
+        <layer id="evolution" name="Evolution Pipeline" color="#fce4ec" stroke="#880e4f">
+            <components>
+                <component id="seeds" name="Seed Questions" description="Initial generation">
+                    <type>question-generator</type>
+                    <output>Basic questions from document content</output>
+                    <count>3 questions per document</count>
+                </component>
+                <component id="simple" name="Simple Evolution" description="Enhanced detail">
+                    <type>question-evolution</type>
+                    <output>Questions with more complexity and detail</output>
+                    <count>3 questions</count>
+                    <characteristics>
+                        <characteristic>Maintains core meaning</characteristic>
+                        <characteristic>Adds sophistication</characteristic>
+                        <characteristic>Enhanced complexity</characteristic>
+                    </characteristics>
+                </component>
+                <component id="multi" name="Multi-Context Evolution" description="Cross-document analysis">
+                    <type>question-evolution</type>
+                    <output>Questions spanning multiple documents</output>
+                    <count>3 questions</count>
+                    <characteristics>
+                        <characteristic>Cross-document analysis</characteristic>
+                        <characteristic>Comprehensive coverage</characteristic>
+                        <characteristic>Context integration</characteristic>
+                    </characteristics>
+                </component>
+                <component id="reasoning" name="Reasoning Evolution" description="Logical analysis">
+                    <type>question-evolution</type>
+                    <output>Questions requiring logical reasoning</output>
+                    <count>3 questions</count>
+                    <characteristics>
+                        <characteristic>Logical reasoning</characteristic>
+                        <characteristic>Analytical thinking</characteristic>
+                        <characteristic>Problem-solving</characteristic>
+                    </characteristics>
+                </component>
+            </components>
+        </layer>
+
+        <layer id="output" name="Output Generation" color="#f1f8e9" stroke="#33691e">
+            <components>
+                <component id="questions" name="Evolved Questions" description="3 types × 3 each">
+                    <type>output</type>
+                    <total>9 questions</total>
+                    <distribution>
+                        <type name="simple" count="3"/>
+                        <type name="multi-context" count="3"/>
+                        <type name="reasoning" count="3"/>
+                    </distribution>
+                </component>
+                <component id="answers" name="Generated Answers" description="Comprehensive responses">
+                    <type>output</type>
+                    <characteristics>
+                        <characteristic>Detailed explanations</characteristic>
+                        <characteristic>Context-aware</characteristic>
+                        <characteristic>Comprehensive coverage</characteristic>
+                    </characteristics>
+                </component>
+                <component id="contexts" name="Relevant Contexts" description="Document sections">
+                    <type>output</type>
+                    <characteristics>
+                        <characteristic>Semantic matching</characteristic>
+                        <characteristic>Document sections</characteristic>
+                        <characteristic>Relevance scoring</characteristic>
+                    </characteristics>
+                </component>
+            </components>
+        </layer>
+    </layers>
+
+    <data-flows>
+        <flow id="user-upload" from="ui" to="file-upload" description="User initiates file upload"/>
+        <flow id="file-processing" from="file-upload" to="pdf" description="PDF files sent to PDF.js"/>
+        <flow id="csv-processing" from="file-upload" to="csv" description="CSV files sent to Papa Parse"/>
+        <flow id="txt-processing" from="file-upload" to="txt" description="Text files sent to direct processing"/>
+        <flow id="api-receive" from="pdf" to="fastapi" description="Processed content sent to API"/>
+        <flow id="api-receive-csv" from="csv" to="fastapi" description="CSV data sent to API"/>
+        <flow id="api-receive-txt" from="txt" to="fastapi" description="Text data sent to API"/>
+        <flow id="workflow-start" from="fastapi" to="langgraph" description="API triggers LangGraph workflow"/>
+        <flow id="seed-generation" from="langgraph" to="seeds" description="Generate initial seed questions"/>
+        <flow id="simple-evolution" from="seeds" to="simple" description="Apply simple evolution"/>
+        <flow id="multi-evolution" from="simple" to="multi" description="Apply multi-context evolution"/>
+        <flow id="reasoning-evolution" from="multi" to="reasoning" description="Apply reasoning evolution"/>
+        <flow id="llm-integration" from="langgraph" to="llm" description="LangGraph uses LLM for generation"/>
+        <flow id="embedding-integration" from="langgraph" to="embeddings" description="LangGraph uses embeddings for context"/>
+        <flow id="question-output" from="reasoning" to="questions" description="Final evolved questions"/>
+        <flow id="answer-output" from="reasoning" to="answers" description="Generated answers"/>
+        <flow id="context-output" from="reasoning" to="contexts" description="Relevant contexts"/>
+        <flow id="progress-updates" from="langgraph" to="sse" description="Progress updates via SSE"/>
+        <flow id="progress-display" from="sse" to="progress" description="Progress displayed to user"/>
+        <flow id="results-display" from="questions" to="results" description="Questions displayed in UI"/>
+        <flow id="results-display-answers" from="answers" to="results" description="Answers displayed in UI"/>
+        <flow id="results-display-contexts" from="contexts" to="results" description="Contexts displayed in UI"/>
+        <flow id="auth-llm" from="auth" to="llm" description="Authentication for LLM"/>
+        <flow id="auth-embeddings" from="auth" to="embeddings" description="Authentication for embeddings"/>
+    </data-flows>
+
+    <deployment>
+        <environment name="development">
+            <server>localhost:8000</server>
+            <database>None (in-memory)</database>
+            <file-storage>Local filesystem</file-storage>
+        </environment>
+        <environment name="production">
+            <server>Vercel serverless</server>
+            <database>None (stateless)</database>
+            <file-storage>Client-side processing</file-storage>
+        </environment>
+    </deployment>
+
+    <performance>
+        <metrics>
+            <metric name="upload-limit" value="10 files" description="Maximum files per upload"/>
+            <metric name="file-size-limit" value="2MB" description="Maximum file size"/>
+            <metric name="processing-time" value="30-60 seconds" description="Typical processing time"/>
+            <metric name="question-count" value="3-15" description="Target question range"/>
+        </metrics>
+    </performance>
+
+    <security>
+        <features>
+            <feature>Client-side file processing</feature>
+            <feature>Secure API key storage</feature>
+            <feature>CORS configuration</feature>
+            <feature>Input validation</feature>
+        </features>
+    </security>
+</system-architecture> 

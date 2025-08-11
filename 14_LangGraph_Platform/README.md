@@ -53,10 +53,85 @@ Run the repository and complete the following:
 
 What is the purpose of the `chunk_overlap` parameter when using `RecursiveCharacterTextSplitter` to prepare documents for RAG, and what trade-offs arise as you increase or decrease its value?
 
+#### ✅ Answer:
+The `chunk_overlap` parameter in `RecursiveCharacterTextSplitter` controls how much text is shared between consecutive chunks when splitting documents for RAG.
+
+**Purpose**: It ensures context continuity between chunks by allowing adjacent chunks to share some text.
+
+**Trade-offs**:
+
+- **Increasing overlap**:
+  - ✅ Better context preservation across chunk boundaries
+  - ✅ Reduces risk of losing important information at chunk edges
+  - ❌ More storage/memory usage
+  - ❌ Potential redundancy in retrieved content
+
+- **Decreasing overlap**:
+  - ✅ More efficient storage and retrieval
+  - ✅ Less duplicate content
+  - ❌ Risk of losing context at chunk boundaries
+  - ❌ May break up coherent ideas or sentences
+
+In this project, `chunk_overlap=0` means no overlap between chunks, which is memory-efficient but could lose context at chunk boundaries. For financial aid documents with complex regulations, some overlap (like 50-100 tokens) might improve answer quality by maintaining context continuity.
+
+
 #### ❓ Question:
 
 Your retriever is configured with `search_kwargs={"k": 5}`. How would adjusting `k` likely affect RAGAS metrics such as Context Precision and Context Recall in practice, and why?
 
+#### ✅ Answer:
+
+The `k=5` parameter in `search_kwargs` controls how many document chunks the retriever returns for each query.
+
+**Impact on RAGAS metrics**:
+
+- **Context Precision**: 
+  - Lower `k` (e.g., 3) → Higher precision (more relevant chunks)
+  - Higher `k` (e.g., 10) → Lower precision (more irrelevant chunks included)
+
+- **Context Recall**:
+  - Lower `k` → Lower recall (might miss relevant chunks)
+  - Higher `k` → Higher recall (more likely to capture all relevant information)
+
+**Why this happens**:
+- With `k=5`, we're getting the top 5 most similar chunks
+- If relevant information is spread across more than 5 chunks, we'll miss some (low recall)
+- If the top 5 chunks are highly relevant, precision stays high
+- Increasing `k` trades precision for recall by including more chunks, some of which may be less relevant
+
+**Practical consideration**: For financial aid documents with complex, interconnected regulations, `k=5` might be too low to capture all relevant context, suggesting a higher value could improve recall while maintaining acceptable precision.
+
+
 #### ❓ Question:
 
 Compare the `agent` and `agent_helpful` assistants defined in `langgraph.json`. Where does the helpfulness evaluator fit in the graph, and under what condition should execution route back to the agent vs. terminate?
+
+#### ✅ Answer:
+
+1. **simple_agent**:
+- Basic tool-using agent
+- Flow: 
+`User Input → Agent (with tools) → Tool Execution (if needed) → Response → End`
+
+
+2. **agent_with_helpfulness**:
+- Enhanced agent with helpfulness evaluation loops
+- Flow:
+`User Input → Agent → Tool Execution (if needed) → Helpfulness Check → Loop or End`
+
+The helpfulness agent includes a sophisticated evaluation loop that:
+
+- Assesses response quality after each iteration
+- Continues improving responses until deemed helpful
+- Has built-in loop limits to prevent infinite execution
+
+**Where helpfulness evaluator fits**:
+The helpfulness node sits **after** the agent responds (when no tools are needed) and **before** termination.
+
+**Routing conditions**:
+- **Route back to agent**: When helpfulness evaluator returns "N" (not helpful) - allows the agent to improve its response
+- **Terminate**: When helpfulness evaluator returns "Y" (helpful) or when loop limit (10 messages) is exceeded
+
+**Key difference**: 
+
+The simple agent terminates immediately after responding, while the helpful agent can loop back multiple times to refine responses until they meet helpfulness criteria or hit the safety limit.

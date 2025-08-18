@@ -83,6 +83,12 @@ Build a LangGraph Graph to "use" your application.
 
 Do this by creating a Simple Agent that can make API calls to the 🤖Agent Node above through the A2A protocol. 
 
+### ✅ Answer:
+
+Built a LangGraph-based client agent that demonstrates A2A (Agent-to-Agent) protocol communication with our existing server agent
+
+See more details in [CLIENT_README.md](https://github.com/surbhimotghare/myAIE7/blob/s15-assignment-a2a-langgraph/15_A2A_LangGraph/app/CLIENT_README.md)
+
 ### ❓ Question #1:
 
 What are the core components of an `AgentCard`?

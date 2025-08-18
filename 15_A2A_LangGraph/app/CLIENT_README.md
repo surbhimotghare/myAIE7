@@ -4,6 +4,7 @@ This directory contains the **Client Agent** implementation for Activity #1, dem
 
 ## 🏗️ Architecture
 
+### System Overview
 ```
 ┌─────────────────┐    A2A Protocol    ┌─────────────────┐
 │   Client Agent  │ ───────────────→   │   Server Agent  │
@@ -14,6 +15,107 @@ This directory contains the **Client Agent** implementation for Activity #1, dem
 │ - Response      │                    │ - RAG Search    │
 │   Processor     │                    │ - Helpfulness  │
 └─────────────────┘                    └─────────────────┘
+```
+
+### Detailed Flow Architecture
+
+```mermaid
+graph TD
+    %% User Interaction
+    A[👤 User Query] --> B[🚀 Client Agent]
+    
+    %% Client Agent Internal Flow
+    B --> C[🧠 Query Router Node]
+    C --> D{🔍 Query Complexity}
+    D -->|Simple| E[📞 Single A2A Call]
+    D -->|Complex| F[🔄 Multiple A2A Calls]
+    
+    %% A2A Communication
+    E --> G[📡 A2A Protocol]
+    F --> G
+    G --> H[🤖 Server Agent]
+    
+    %% Server Agent Processing
+    H --> I[🎯 Helpfulness Evaluation]
+    I --> J{🔧 Tool Calls Needed?}
+    J -->|Yes| K[⚡ Tool Execution]
+    J -->|No| L[✅ Response Ready]
+    
+    %% Tool Execution
+    K --> M[🌐 Web Search]
+    K --> N[📚 ArXiv Search]
+    K --> O[📄 RAG Retrieval]
+    M --> P[🔄 Back to Agent]
+    N --> P
+    O --> P
+    P --> I
+    
+    %% Response Processing
+    L --> Q[📤 A2A Response]
+    E --> Q
+    Q --> R[🔄 Response Processor]
+    
+    %% Client Response Synthesis
+    R --> S{📊 Multiple Responses?}
+    S -->|Yes| T[🔗 Response Synthesis]
+    S -->|No| U[📝 Final Answer]
+    T --> U
+    
+    %% Final Output
+    U --> V[👤 User Response]
+    
+    %% Styling
+    style A fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style B fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style C fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style H fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style G fill:#e0f2f1,stroke:#004d40,stroke-width:2px
+    style V fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style M fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px
+    style N fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style O fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+```
+
+### LangGraph Node Architecture
+
+```mermaid
+graph LR
+    %% Client Agent Graph
+    subgraph "Client Agent LangGraph"
+        CA[📥 Entry Point] --> CR[🧠 Query Router]
+        CR --> CC[📞 A2A Caller]
+        CC --> CP[🔄 Response Processor]
+        CP --> CE[📤 End]
+        
+        %% Conditional Edges
+        CC -.->|Multiple Calls| CC
+        CC --> CP
+    end
+    
+    %% Server Agent Graph
+    subgraph "Server Agent LangGraph"
+        SA[📥 User Query] --> SM[🤖 Model + Tools]
+        SM --> SR{🔍 Tool Calls?}
+        SR -->|Yes| ST[⚡ Tool Execution]
+        SR -->|No| SH[🎯 Helpfulness Eval]
+        ST --> SM
+        SH --> SD{✅ Helpful?}
+        SD -->|Yes| SE[📤 Complete]
+        SD -->|No| SM
+    end
+    
+    %% Communication
+    CC -.->|A2A Protocol| SA
+    SE -.->|A2A Response| CP
+    
+    %% Styling
+    style CA fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style CR fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style CC fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style CP fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style SA fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style SM fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style SH fill:#fff3e0,stroke:#e65100,stroke-width:2px
 ```
 
 ## 📁 Files

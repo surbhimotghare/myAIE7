@@ -87,9 +87,71 @@ Do this by creating a Simple Agent that can make API calls to the 🤖Agent Node
 
 What are the core components of an `AgentCard`?
 
+### ✅ Answer:
+The AgentCard essentially serves as the agent's "business card" that tells other agents what it can do and how to communicate with it. 
+The core components of an `AgentCard` are as follows:
+
+1. **Identity Information**
+   - `name`: Agent's display name
+   - `description`: What the agent does
+   - `version`: Agent version number
+   - `url`: Agent's endpoint URL
+
+2. **Communication Capabilities**
+   - `capabilities`: What features it supports (streaming, push notifications)
+   - `default_input_modes`: Supported input formats (e.g., "text", "text/plain")
+   - `default_output_modes`: Supported output formats
+   - `preferred_transport`: Communication protocol (e.g., "JSONRPC")
+   - `protocol_version`: A2A protocol version
+
+3. **Functional Skills**
+   - `skills`: Array of specific abilities the agent can perform
+     - Each skill has: `id`, `name`, `description`, `tags`, `examples`
+
+**Example from our code:**
+```python
+AgentCard(
+    name='General Purpose Agent',
+    description='AI assistant with web search, academic papers, and document retrieval',
+    url=f'http://{host}:{port}/',
+    version='1.0.0',
+    capabilities=AgentCapabilities(streaming=True, push_notifications=True),
+    skills=[web_search_skill, arxiv_search_skill, rag_search_skill]
+)
+```
+
 ### ❓ Question #2:
 
 Why is A2A (and other such protocols) important in your own words?
+
+### ✅ Answer:
+
+A2A protocols are crucial because they enable AI agents to work together like humans do in teams.
+
+### Key Importance:
+
+1. **Specialization & Collaboration**
+   - Each agent can focus on what it does best (web search, research, analysis)
+   - Agents can combine their strengths to solve complex problems
+
+2. **Scalability & Modularity**
+   - Add new agents without rebuilding existing ones
+   - Create agent ecosystems that grow organically
+
+3. **Standardization**
+   - Like HTTP for websites, A2A creates a common "language" for agents
+   - Any agent can talk to any other agent, regardless of their internal implementation
+
+4. **Self-Improvement**
+   - Agents can evaluate and improve each other's responses
+   - Creates feedback loops that enhance overall system quality
+
+5. **Real-World Impact**
+   - Enables distributed AI systems where different organizations can contribute specialized agents
+   - Prevents AI silos and promotes interoperability
+
+**Summary:** A2A protocols transform isolated AI tools into collaborative AI ecosystems, much like how the internet transformed isolated computers into a connected global network. This enables more sophisticated, reliable, and scalable AI solutions that can tackle complex real-world problems through intelligent cooperation.
+
 
 ### 🚧 Advanced Build:
 

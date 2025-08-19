@@ -71,9 +71,7 @@ logs/
 temp/
 tmp/
 
-# Test files with API keys
-test_*.py
-*_test.py
+# Setup or API keys
 setup_*.py
 
 # Evaluation results (may contain sensitive data)
